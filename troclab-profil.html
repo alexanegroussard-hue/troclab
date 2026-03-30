@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Troclab – Mon profil</title>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #0099ff;
+      --blue-dark: #0077cc;
+      --blue-light: #e8f4ff;
+      --orange: #d6965e;
+      --orange-light: #fff3e8;
+      --green: #2ea04d;
+      --bg: #f0f4fa;
+      --white: #fff;
+      --text: #1a1a2e;
+      --muted: #7a8a9a;
+      --border: #dde3ef;
+      --shadow: 0 4px 24px rgba(0,100,200,0.08);
+    }
+
+    body {
+      font-family: 'Figtree', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,0.94); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; height: 58px;
+    }
+    .nav-logo { font-size: 1.3rem; font-weight: 900; letter-spacing: -0.5px; color: var(--text); }
+    .nav-logo span { color: var(--blue); }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-size: 0.88rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--blue); }
+    .nav-links a.active { color: var(--blue); font-weight: 700; }
+
+    /* MAIN */
+    .main {
+      padding-top: 78px;
+      max-width: 980px;
+      margin: 0 auto;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-bottom: 60px;
+    }
+
+    /* VIEW SWITCHER */
+    .view-switcher {
+      display: flex; gap: 8px; margin-bottom: 28px;
+    }
+    .view-btn {
+      padding: 9px 20px; border-radius: 10px; font-size: 0.88rem;
+      font-weight: 700; cursor: pointer; border: 2px solid var(--border);
+      background: var(--white); color: var(--muted);
+      font-family: 'Figtree', sans-serif; transition: all 0.2s;
+    }
+    .view-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
+    .view-btn:hover:not(.active) { border-color: var(--blue); color: var(--blue); }
+
+    /* ========== INSCRIPTION ========== */
+    .signup-wrap {
+      display: grid; grid-template-columns: 1fr 380px; gap: 28px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--white); border-radius: 20px;
+      border: 1.5px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 22px 26px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .card-icon {
+      width: 42px; height: 42px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .card-header h2 { font-size: 1rem; font-weight: 800; }
+    .card-header p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+    .card-body { padding: 22px 26px; }
+
+    /* STEPS */
+    .steps-bar {
+      display: flex; align-items: center; gap: 0;
+      margin-bottom: 26px;
+    }
+    .step-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.78rem; font-weight: 700;
+    }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 800; flex-shrink: 0;
+    }
+    .step-item.done .step-num { background: var(--green); color: white; }
+    .step-item.active .step-num { background: var(--blue); color: white; box-shadow: 0 0 0 4px var(--blue-light); }
+    .step-item.pending .step-num { background: var(--bg); color: var(--muted); border: 2px solid var(--border); }
+    .step-item.done .step-label { color: var(--green); }
+    .step-item.active .step-label { color: var(--blue); }
+    .step-item.pending .step-label { color: var(--muted); }
+    .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 6px; min-width: 20px; }
+    .step-line.done { background: var(--green); }
+
+    /* FORM */
+    .form-section { margin-bottom: 22px; }
+    .form-section-title {
+      font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--muted); margin-bottom: 14px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-field { margin-bottom: 14px; }
+    .form-field label {
+      display: block; font-size: 0.78rem; font-weight: 700;
+      color: var(--text); margin-bottom: 6px;
+    }
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'Figtree', sans-serif; font-size: 0.88rem;
+      color: var(--text); background: var(--bg); outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+      border-color: var(--blue); background: white;
+    }
+    .form-field textarea { resize: vertical; min-height: 80px; }
+    .form-hint { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+
+    /* TYPE SELECTOR */
+    .type-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .type-option {
+      border: 2px solid var(--border); border-radius: 14px;
+      padding: 14px 16px; cursor: pointer; transition: all 0.2s;
+      background: var(--white);
+    }
+    .type-option:hover { border-color: var(--blue); }
+    .type-option.selected-maker { border-color: var(--blue); background: var(--blue-light); }
+    .type-option.selected-thinker { border-color: var(--orange); background: var(--orange-light); }
+    .type-emoji { font-size: 1.8rem; margin-bottom: 6px; }
+    .type-name { font-size: 0.9rem; font-weight: 800; margin-bottom: 3px; }
+    .type-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.4; }
+
+    /* SKILLS INPUT */
+    .skills-input-wrap {
+      border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 10px; background: var(--bg); transition: border-color 0.2s;
+      min-height: 56px;
+    }
+    .skills-input-wrap:focus-within { border-color: var(--blue); background: white; }
+    .skills-tags-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+    .skill-pill {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 700;
+    }
+    .skill-pill.offer { background: var(--blue-light); color: var(--blue-dark); }
+    .skill-pill.need { background: var(--orange-light); color: #c47300; }
+    .skill-pill button {
+      background: none; border: none; cursor: pointer;
+      font-size: 0.7rem; opacity: 0.6; padding: 0; line-height: 1;
+      transition: opacity 0.2s;
+    }
+    .skill-pill button:hover { opacity: 1; }
+    .skill-input-inner {
+      display: flex; gap: 6px;
+    }
+    .skill-input-inner input {
+      flex: 1; border: none; background: transparent;
+      font-family: 'Figtree', sans-serif; font-size: 0.85rem;
+      color: var(--text); outline: none; padding: 2px 4px;
+      min-width: 120px;
+    }
+    .skill-add-btn {
+      padding: 4px 10px; background: var(--blue); color: white;
+      border: none; border-radius: 7px; font-size: 0.75rem;
+      font-weight: 700; cursor: pointer; font-family: 'Figtree', sans-serif;
+      transition: background 0.2s;
+    }
+    .skill-add-btn:hover { background: var(--blue-dark); }
+    .skill-add-btn.orange { background: var(--orange); }
+    .skill-add-btn.orange:hover { background: #c47300; }
+
+    /* SUGGESTED SKILLS */
+    .suggested-skills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .suggest-tag {
+      padding: 4px 10px; border-radius: 7px; font-size: 0.75rem;
+      font-weight: 600; cursor: pointer; border: 1.5px dashed var(--border);
+      color: var(--muted); background: white; transition: all 0.15s;
+      font-family: 'Figtree', sans-serif;
+    }
+    .suggest-tag:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* AVATAR PICKER */
+    .avatar-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .avatar-opt {
+      width: 48px; height: 48px; border-radius: 12px;
+      font-size: 1.5rem; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: 2px solid var(--border);
+      transition: all 0.15s; background: var(--bg);
+    }
+    .avatar-opt:hover { border-color: var(--blue); transform: scale(1.1); }
+    .avatar-opt.selected { border-color: var(--blue); background: var(--blue-light); box-shadow: 0 0 0 3px var(--blue-light); }
+
+    /* FORM ACTIONS */
+    .form-actions { display: flex; gap: 10px; margin-top: 6px; }
+    .btn-prev {
+      padding: 12px 20px; background: var(--bg); color: var(--muted);
+      border: 1.5px solid var(--border); border-radius: 12px;
+      font-weight: 700; font-size: 0.9rem; cursor: pointer;
+      font-family: 'Figtree', sans-serif; transition: all 0.2s;
+    }
+    .btn-prev:hover { border-color: var(--blue); color: var(--blue); }
+    .btn-next {
+      flex: 1; padding: 12px; background: var(--blue); color: white;
+      border: none; border-radius: 12px; font-weight: 800; font-size: 0.9rem;
+      cursor: pointer; font-family: 'Figtree', sans-serif;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-next:hover { background: var(--blue-dark); transform: translateY(-1px); }
+    .btn-next.orange { background: var(--orange); }
+    .btn-next.orange:hover { background: #c47300; }
+
+    /* PREVIEW CARD */
+    .preview-card {
+      background: var(--white); border-radius: 20px;
+      border: 1.5px solid var(--border); box-shadow: var(--shadow);
+      overflow: hidden; position: sticky; top: 80px;
+    }
+    .preview-header {
+      padding: 22px 22px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .preview-header h3 { font-size: 0.88rem; font-weight: 800; color: var(--muted); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .preview-org {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .preview-avatar {
+      width: 52px; height: 52px; border-radius: 14px;
+      font-size: 1.6rem; display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+    }
+    .preview-name { font-size: 1rem; font-weight: 800; }
+    .preview-city { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    .preview-type-badge {
+      display: inline-block; margin-top: 6px;
+      padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700;
+    }
+    .preview-body { padding: 16px 22px; }
+    .preview-section { margin-bottom: 14px; }
+    .preview-section-title {
+      font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 7px;
+    }
+    .preview-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .preview-tag { font-size: 0.75rem; padding: 3px 9px; border-radius: 7px; font-weight: 600; }
+    .preview-empty { font-size: 0.78rem; color: var(--border); font-style: italic; }
+
+    .map-preview {
+      height: 130px; background: linear-gradient(135deg, #dce8f8, #c8d8ee);
+      position: relative; display: flex; align-items: center; justify-content: center;
+      border-top: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .map-preview-pin { font-size: 2rem; filter: drop-shadow(0 4px 8px rgba(0,100,200,0.3)); }
+    .map-preview-label {
+      position: absolute; bottom: 12px;
+      font-size: 0.75rem; font-weight: 700; color: var(--muted);
+    }
+
+    /* ========== PROFIL VIEW ========== */
+    .profile-wrap {
+      display: grid; grid-template-columns: 300px 1fr; gap: 24px;
+      align-items: start;
+    }
+
+    .profile-sidebar { position: sticky; top: 80px; }
+
+    .profile-hero {
+      background: var(--white); border-radius: 20px;
+      border: 1.5px solid var(--border); box-shadow: var(--shadow);
+      overflow: hidden; margin-bottom: 16px;
+    }
+    .profile-banner {
+      height: 80px;
+      background: linear-gradient(135deg, var(--blue) 0%, #00ccff 100%);
+    }
+    .profile-avatar-wrap { padding: 0 20px; margin-top: -28px; margin-bottom: 14px; }
+    .profile-avatar-lg {
+      width: 56px; height: 56px; border-radius: 16px;
+      font-size: 1.8rem; display: flex; align-items: center; justify-content: center;
+      background: white; border: 3px solid white;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    .profile-info { padding: 0 20px 18px; }
+    .profile-name { font-size: 1.1rem; font-weight: 900; }
+    .profile-city { font-size: 0.8rem; color: var(--muted); margin: 2px 0 8px; }
+    .profile-desc { font-size: 0.82rem; color: var(--text); line-height: 1.55; }
+    .profile-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--border); text-align: center;
+    }
+    .stat { padding: 12px 8px; border-right: 1px solid var(--border); }
+    .stat:last-child { border-right: none; }
+    .stat-num { font-size: 1.2rem; font-weight: 900; color: var(--blue); }
+    .stat-label { font-size: 0.68rem; color: var(--muted); font-weight: 600; margin-top: 1px; }
+
+    .profile-actions { display: flex; flex-direction: column; gap: 8px; padding: 16px 20px; border-top: 1px solid var(--border); }
+    .profile-action-btn {
+      width: 100%; padding: 10px; border-radius: 10px; font-size: 0.85rem;
+      font-weight: 700; cursor: pointer; font-family: 'Figtree', sans-serif;
+      transition: all 0.2s; border: none;
+    }
+    .profile-action-btn.primary { background: var(--blue); color: white; }
+    .profile-action-btn.primary:hover { background: var(--blue-dark); }
+    .profile-action-btn.secondary { background: var(--bg); color: var(--text); border: 1.5px solid var(--border); }
+    .profile-action-btn.secondary:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* COMPLETENESS */
+    .completeness-card {
+      background: var(--white); border-radius: 16px;
+      border: 1.5px solid var(--border); padding: 16px 18px;
+      box-shadow: var(--shadow);
+    }
+    .completeness-title { font-size: 0.8rem; font-weight: 800; margin-bottom: 10px; }
+    .progress-bar-wrap { background: var(--bg); border-radius: 20px; height: 8px; overflow: hidden; margin-bottom: 8px; }
+    .progress-bar { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--blue), #00ccff); transition: width 0.6s ease; }
+    .completeness-pct { font-size: 0.8rem; font-weight: 800; color: var(--blue); }
+    .completeness-items { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .comp-item { display: flex; align-items: center; gap: 7px; font-size: 0.77rem; font-weight: 600; }
+    .comp-item.done { color: var(--green); }
+    .comp-item.todo { color: var(--muted); }
+
+    /* PROFILE MAIN CONTENT */
+    .profile-content { display: flex; flex-direction: column; gap: 18px; }
+
+    .section-card {
+      background: var(--white); border-radius: 20px;
+      border: 1.5px solid var(--border); box-shadow: var(--shadow);
+    }
+    .section-card-header {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-card-header h3 { font-size: 0.92rem; font-weight: 800; }
+    .edit-btn {
+      font-size: 0.75rem; font-weight: 700; padding: 5px 12px;
+      background: var(--bg); color: var(--muted); border: 1.5px solid var(--border);
+      border-radius: 8px; cursor: pointer; font-family: 'Figtree', sans-serif;
+      transition: all 0.15s;
+    }
+    .edit-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .section-card-body { padding: 18px 22px; }
+
+    .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .skills-col-title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+    .skills-col-title.offer { color: var(--blue); }
+    .skills-col-title.need { color: var(--orange); }
+    .skills-col-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    /* TROCS HISTORY */
+    .troc-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .troc-item:last-child { border-bottom: none; }
+    .troc-avatar { width: 40px; height: 40px; border-radius: 11px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+    .troc-body { flex: 1; }
+    .troc-name { font-size: 0.88rem; font-weight: 700; }
+    .troc-detail { font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
+    .troc-status-badge { font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+    .status-done { background: #e8f7ee; color: var(--green); }
+    .status-active { background: var(--blue-light); color: var(--blue); }
+    .status-pending { background: var(--orange-light); color: var(--orange); }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1a1a2e; color: white; padding: 11px 22px;
+      border-radius: 40px; font-size: 0.86rem; font-weight: 600;
+      z-index: 999; display: none;
+      animation: toastIn 0.3s ease;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ANIM */
+    .fade-in { animation: fadeIn 0.35s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Troc<span>lab</span></div>
+  <div class="nav-links">
+    <a href="#">Carte</a>
+    <a href="#">Messagerie</a>
+    <a href="#" class="active">Mon profil</a>
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- SWITCHER -->
+  <div class="view-switcher">
+    <button class="view-btn active" onclick="showView('signup', this)">✦ Créer mon profil</button>
+    <button class="view-btn" onclick="showView('profile', this)">👤 Voir mon profil</button>
+  </div>
+
+  <!-- ===== SIGNUP ===== -->
+  <div id="signupView" class="fade-in">
+    <div class="signup-wrap">
+
+      <!-- FORM -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:#e8f4ff">🏗</div>
+          <div>
+            <h2>Crée le profil de ton organisation</h2>
+            <p>3 étapes · moins de 5 minutes</p>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <!-- Steps bar -->
+          <div class="steps-bar">
+            <div class="step-item active" id="stepItem1">
+              <div class="step-num">1</div>
+              <span class="step-label">Infos générales</span>
+            </div>
+            <div class="step-line" id="stepLine1"></div>
+            <div class="step-item pending" id="stepItem2">
+              <div class="step-num">2</div>
+              <span class="step-label">Compétences</span>
+            </div>
+            <div class="step-line" id="stepLine2"></div>
+            <div class="step-item pending" id="stepItem3">
+              <div class="step-num">3</div>
+              <span class="step-label">Finalisation</span>
+            </div>
+          </div>
+
+          <!-- STEP 1 -->
+          <div id="step1" class="fade-in">
+            <div class="form-section">
+              <div class="form-section-title">🏢 Identité</div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Nom de l'organisation *</label>
+                  <input type="text" id="orgName" placeholder="ex: FabLab Rennes" oninput="updatePreview()">
+                </div>
+                <div class="form-field">
+                  <label>Ville *</label>
+                  <input type="text" id="orgCity" placeholder="ex: Rennes" oninput="updatePreview()">
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Description courte</label>
+                <textarea id="orgDesc" placeholder="Décris ton organisation en quelques mots…" oninput="updatePreview()"></textarea>
+                <div class="form-hint">Max 200 caractères · visible sur la carte</div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">🎨 Avatar</div>
+              <div class="avatar-grid" id="avatarGrid"></div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">⚡ Type de profil *</div>
+              <div class="type-selector">
+                <div class="type-option" onclick="selectType('maker', this)">
+                  <div class="type-emoji">🛠</div>
+                  <div class="type-name">Maker</div>
+                  <div class="type-desc">Fablab, atelier numérique, espace de fabrication — vous maîtrisez des outils et machines</div>
+                </div>
+                <div class="type-option" onclick="selectType('thinker', this)">
+                  <div class="type-emoji">💡</div>
+                  <div class="type-name">Thinker</div>
+                  <div class="type-desc">Collectif, association, tiers-lieu — vous maîtrisez méthodes, gouvernance, pédagogie</div>
+                </div>
+              </div>
+              <div style="margin-top:8px">
+                <div class="type-option" onclick="selectType('both', this)" style="display:flex; align-items:center; gap:12px; padding:12px 16px">
+                  <div style="font-size:1.4rem">⚡</div>
+                  <div>
+                    <div class="type-name">Hybride</div>
+                    <div class="type-desc">Les deux à la fois !</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn-next" onclick="goStep(2)">Suivant : Compétences →</button>
+            </div>
+          </div>
+
+          <!-- STEP 2 -->
+          <div id="step2" style="display:none" class="fade-in">
+            <div class="form-section">
+              <div class="form-section-title" style="color:var(--blue)">✦ Ce que vous proposez</div>
+              <div class="skills-input-wrap">
+                <div class="skills-tags-row" id="offerTags"></div>
+                <div class="skill-input-inner">
+                  <input type="text" id="offerInput" placeholder="ex: Formation Arduino, Découpe laser…" onkeydown="addSkillKey(event,'offer')">
+                  <button class="skill-add-btn" onclick="addSkill('offer')">+ Ajouter</button>
+                </div>
+              </div>
+              <div class="suggested-skills" id="offerSuggestions"></div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title" style="color:var(--orange)">◇ Ce que vous cherchez</div>
+              <div class="skills-input-wrap">
+                <div class="skills-tags-row" id="needTags"></div>
+                <div class="skill-input-inner">
+                  <input type="text" id="needInput" placeholder="ex: Gouvernance horizontale, Facilitation…" onkeydown="addSkillKey(event,'need')">
+                  <button class="skill-add-btn orange" onclick="addSkill('need')">+ Ajouter</button>
+                </div>
+              </div>
+              <div class="suggested-skills" id="needSuggestions"></div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">📍 Localisation sur la carte</div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Région</label>
+                  <select id="orgRegion" onchange="updatePreview()">
+                    <option value="">Choisir une région…</option>
+                    <option>Île-de-France</option>
+                    <option>Bretagne</option>
+                    <option>Pays de la Loire</option>
+                    <option>Nouvelle-Aquitaine</option>
+                    <option>Occitanie</option>
+                    <option>Auvergne-Rhône-Alpes</option>
+                    <option>PACA</option>
+                    <option>Grand Est</option>
+                    <option>Hauts-de-France</option>
+                    <option>Normandie</option>
+                    <option>Bourgogne-Franche-Comté</option>
+                    <option>Centre-Val de Loire</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label>Rayon d'action</label>
+                  <select>
+                    <option>Local (< 50km)</option>
+                    <option>Régional</option>
+                    <option>National</option>
+                    <option>En ligne uniquement</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn-prev" onclick="goStep(1)">← Retour</button>
+              <button class="btn-next" onclick="goStep(3)">Suivant : Finalisation →</button>
+            </div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div id="step3" style="display:none" class="fade-in">
+            <div class="form-section">
+              <div class="form-section-title">🔐 Connexion</div>
+              <div class="form-field">
+                <label>Email de l'organisation *</label>
+                <input type="email" placeholder="contact@monfablab.fr">
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Mot de passe *</label>
+                  <input type="password" placeholder="••••••••">
+                </div>
+                <div class="form-field">
+                  <label>Confirmer *</label>
+                  <input type="password" placeholder="••••••••">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="form-section-title">📞 Contact (optionnel)</div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Site web</label>
+                  <input type="url" placeholder="https://…">
+                </div>
+                <div class="form-field">
+                  <label>Téléphone</label>
+                  <input type="tel" placeholder="06 …">
+                </div>
+              </div>
+            </div>
+
+            <div style="background:var(--blue-light); border-radius:12px; padding:14px 16px; margin-bottom:18px; font-size:0.82rem; line-height:1.6; color:var(--blue-dark)">
+              🔒 <strong>Troclab est 100% gratuit et open-source.</strong> Tes données ne sont jamais vendues ni partagées sans ton accord.
+            </div>
+
+            <div class="form-actions">
+              <button class="btn-prev" onclick="goStep(2)">← Retour</button>
+              <button class="btn-next orange" onclick="submitSignup()">🚀 Créer mon profil !</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="preview-card" id="previewCard">
+        <div class="preview-header">
+          <h3>Aperçu de ta fiche</h3>
+          <div class="preview-org">
+            <div class="preview-avatar" id="previewAvatar">🏢</div>
+            <div>
+              <div class="preview-name" id="previewName">Nom de l'organisation</div>
+              <div class="preview-city" id="previewCity">Ville</div>
+              <span class="preview-type-badge" id="previewBadge" style="background:var(--bg);color:var(--muted)">Type</span>
+            </div>
+          </div>
+        </div>
+        <div class="preview-body">
+          <div class="preview-section">
+            <div class="preview-section-title">Description</div>
+            <div id="previewDesc" class="preview-empty">Aucune description</div>
+          </div>
+          <div class="preview-section">
+            <div class="preview-section-title" style="color:var(--blue)">✦ Propose</div>
+            <div class="preview-tags" id="previewOffers"><span class="preview-empty">Aucune compétence ajoutée</span></div>
+          </div>
+          <div class="preview-section">
+            <div class="preview-section-title" style="color:var(--orange)">◇ Cherche</div>
+            <div class="preview-tags" id="previewNeeds"><span class="preview-empty">Aucune compétence ajoutée</span></div>
+          </div>
+        </div>
+        <div class="map-preview">
+          <div class="map-preview-pin" id="previewPin">📍</div>
+          <div class="map-preview-label" id="previewMapLabel">Apparaîtra sur la carte</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== PROFIL ===== -->
+  <div id="profileView" style="display:none" class="fade-in">
+    <div class="profile-wrap">
+
+      <!-- SIDEBAR -->
+      <div class="profile-sidebar">
+        <div class="profile-hero">
+          <div class="profile-banner"></div>
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar-lg">⚡</div>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name">MixLab Lyon</div>
+            <div class="profile-city">📍 Lyon · Auvergne-Rhône-Alpes</div>
+            <span class="preview-type-badge" style="background:#e8f7ee;color:#2ea04d;font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:20px">⚡ Hybride</span>
+            <div class="profile-desc" style="margin-top:10px">Espace de fabrication numérique et de médiation à Lyon. Nous croyons que le faire et le penser vont ensemble.</div>
+          </div>
+          <div class="profile-stats">
+            <div class="stat"><div class="stat-num">3</div><div class="stat-label">Trocs réalisés</div></div>
+            <div class="stat"><div class="stat-num">5</div><div class="stat-label">Formations offertes</div></div>
+            <div class="stat"><div class="stat-num">4</div><div class="stat-label">Formations reçues</div></div>
+          </div>
+          <div class="profile-actions">
+            <button class="profile-action-btn primary" onclick="showToast('📬 Message envoyé !')">📬 Proposer un échange</button>
+            <button class="profile-action-btn secondary" onclick="showView('signup', document.querySelector(\'.view-btn\'))">✏️ Modifier le profil</button>
+          </div>
+        </div>
+
+        <div class="completeness-card">
+          <div class="completeness-title">Complétude du profil</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:80%"></div></div>
+          <div class="completeness-pct">80% complété</div>
+          <div class="completeness-items">
+            <div class="comp-item done">✓ Nom & ville</div>
+            <div class="comp-item done">✓ Type de profil</div>
+            <div class="comp-item done">✓ Compétences proposées</div>
+            <div class="comp-item done">✓ Compétences cherchées</div>
+            <div class="comp-item todo">○ Site web (optionnel)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="profile-content">
+
+        <!-- SKILLS -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <h3>🔄 Compétences échangeables</h3>
+            <button class="edit-btn" onclick="showView('signup', document.querySelectorAll('.view-btn')[0]); goStep(2)">✏️ Modifier</button>
+          </div>
+          <div class="section-card-body">
+            <div class="skills-grid">
+              <div>
+                <div class="skills-col-title offer">✦ Ce qu'on propose</div>
+                <div class="skills-col-tags">
+                  <span class="preview-tag" style="background:var(--blue-light);color:var(--blue-dark)">Électronique</span>
+                  <span class="preview-tag" style="background:var(--blue-light);color:var(--blue-dark)">Médiation numérique</span>
+                  <span class="preview-tag" style="background:var(--blue-light);color:var(--blue-dark)">Ateliers</span>
+                  <span class="preview-tag" style="background:var(--blue-light);color:var(--blue-dark)">Impression 3D</span>
+                </div>
+              </div>
+              <div>
+                <div class="skills-col-title need">◇ Ce qu'on cherche</div>
+                <div class="skills-col-tags">
+                  <span class="preview-tag" style="background:var(--orange-light);color:#c47300">Communication</span>
+                  <span class="preview-tag" style="background:var(--orange-light);color:#c47300">Gouvernance</span>
+                  <span class="preview-tag" style="background:var(--orange-light);color:#c47300">Facilitation</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TROCS -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <h3>📋 Historique des trocs</h3>
+            <button class="edit-btn" onclick="showToast('Voir tous les trocs')">Voir tout</button>
+          </div>
+          <div class="section-card-body">
+            <div class="troc-item">
+              <div class="troc-avatar" style="background:#e8f7ee">🌊</div>
+              <div class="troc-body">
+                <div class="troc-name">Lab'oratoire · Marseille</div>
+                <div class="troc-detail">Électronique créative ⇄ Sérigraphie · Il y a 3 jours</div>
+              </div>
+              <span class="troc-status-badge status-done">✓ Terminé</span>
+            </div>
+            <div class="troc-item">
+              <div class="troc-avatar" style="background:#e8f4ff">🏭</div>
+              <div class="troc-body">
+                <div class="troc-name">FabLab Nantes</div>
+                <div class="troc-detail">Arduino ⇄ Impression 3D · En cours</div>
+              </div>
+              <span class="troc-status-badge status-active">⟳ En cours</span>
+            </div>
+            <div class="troc-item">
+              <div class="troc-avatar" style="background:#fff3e8">🌿</div>
+              <div class="troc-body">
+                <div class="troc-name">Tiers-Lieu Bordeaux</div>
+                <div class="troc-detail">Médiation numérique ⇄ Facilitation · En attente</div>
+              </div>
+              <span class="troc-status-badge status-pending">⏳ En attente</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ORGANISATIONS RECOMMANDEES -->
+        <div class="section-card">
+          <div class="section-card-header">
+            <h3>💡 Organisations recommandées</h3>
+            <button class="edit-btn" onclick="showToast('Voir la carte')">Voir sur la carte</button>
+          </div>
+          <div class="section-card-body">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+              ${['🏢 Collectif Commun · Paris · 78%', '🔧 OpenFab Lille · 83%', '💻 HackLab Strasbourg · 76%', '🤝 Réseau Savoir-Faire · Rennes · 81%'].map(r => `
+                <div style="background:var(--bg);border-radius:12px;padding:12px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:background 0.15s;border:1.5px solid transparent" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='transparent'">
+                  ${r.split('·')[0]}<br>
+                  <span style="font-size:0.72rem;color:var(--muted)">${r.split('·').slice(1).join('·')}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ---- STATE ----
+  const avatars = ['🏭','🌿','⚡','🔧','💻','🌊','🤝','💡','🏗','🎨','🌱','🚀'];
+  const offerSkills = [];
+  const needSkills = [];
+  let selectedAvatar = '🏢';
+  let selectedType = null;
+  let currentStep = 1;
+
+  const suggestOffer = ['Impression 3D','Découpe laser','Arduino','Électronique','Couture numérique','Dev web','Facilitation','Médiation','Sérigraphie','CNC'];
+  const suggestNeed = ['Gouvernance','Pédagogie','Communication','Facilitation d\'ateliers','Design thinking','ESS','Animation territoriale'];
+
+  // ---- INIT ----
+  function initAvatars() {
+    const grid = document.getElementById('avatarGrid');
+    grid.innerHTML = avatars.map(a => `
+      <div class="avatar-opt ${a === selectedAvatar ? 'selected' : ''}" onclick="selectAvatar('${a}', this)">${a}</div>
+    `).join('');
+  }
+
+  function initSuggestions() {
+    document.getElementById('offerSuggestions').innerHTML = suggestOffer.map(s =>
+      `<button class="suggest-tag" onclick="addSuggest('offer','${s}')">+ ${s}</button>`
+    ).join('');
+    document.getElementById('needSuggestions').innerHTML = suggestNeed.map(s =>
+      `<button class="suggest-tag" onclick="addSuggest('need','${s}')">+ ${s}</button>`
+    ).join('');
+  }
+
+  // ---- AVATAR ----
+  function selectAvatar(emoji, el) {
+    selectedAvatar = emoji;
+    document.querySelectorAll('.avatar-opt').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('previewAvatar').textContent = emoji;
+    document.getElementById('previewPin').textContent = emoji;
+  }
+
+  // ---- TYPE ----
+  function selectType(type, el) {
+    selectedType = type;
+    document.querySelectorAll('.type-option').forEach(e => e.classList.remove('selected-maker','selected-thinker'));
+    el.classList.add(type === 'maker' ? 'selected-maker' : type === 'thinker' ? 'selected-thinker' : 'selected-maker');
+    const badge = document.getElementById('previewBadge');
+    if (type === 'maker') { badge.style.background='var(--blue-light)'; badge.style.color='var(--blue-dark)'; badge.textContent='🛠 Maker'; }
+    else if (type === 'thinker') { badge.style.background='var(--orange-light)'; badge.style.color='#c47300'; badge.textContent='💡 Thinker'; }
+    else { badge.style.background='#e8f7ee'; badge.style.color='var(--green)'; badge.textContent='⚡ Hybride'; }
+  }
+
+  // ---- SKILLS ----
+  function addSkill(type) {
+    const input = document.getElementById(`${type}Input`);
+    const val = input.value.trim();
+    if (!val) return;
+    const arr = type === 'offer' ? offerSkills : needSkills;
+    if (!arr.includes(val)) { arr.push(val); renderSkills(type); updatePreview(); }
+    input.value = '';
+  }
+  function addSkillKey(e, type) { if (e.key === 'Enter') { e.preventDefault(); addSkill(type); } }
+  function addSuggest(type, val) {
+    const arr = type === 'offer' ? offerSkills : needSkills;
+    if (!arr.includes(val)) { arr.push(val); renderSkills(type); updatePreview(); }
+  }
+  function removeSkill(type, val) {
+    const arr = type === 'offer' ? offerSkills : needSkills;
+    const idx = arr.indexOf(val);
+    if (idx > -1) { arr.splice(idx,1); renderSkills(type); updatePreview(); }
+  }
+  function renderSkills(type) {
+    const arr = type === 'offer' ? offerSkills : needSkills;
+    document.getElementById(`${type}Tags`).innerHTML = arr.map(s =>
+      `<span class="skill-pill ${type}">
+        ${s}
+        <button onclick="removeSkill('${type}','${s}')">✕</button>
+      </span>`
+    ).join('');
+  }
+
+  // ---- STEPS ----
+  function goStep(n) {
+    for (let i=1;i<=3;i++) {
+      const el = document.getElementById(`step${i}`);
+      el.style.display = i===n ? 'block' : 'none';
+      if (i===n) el.classList.add('fade-in');
+      const item = document.getElementById(`stepItem${i}`);
+      item.className = `step-item ${i<n?'done':i===n?'active':'pending'}`;
+      if (i<3) document.getElementById(`stepLine${i}`).className = `step-line ${i<n?'done':''}`;
+    }
+    currentStep = n;
+  }
+
+  // ---- PREVIEW ----
+  function updatePreview() {
+    const name = document.getElementById('orgName').value || 'Nom de l\'organisation';
+    const city = document.getElementById('orgCity').value || 'Ville';
+    const desc = document.getElementById('orgDesc').value;
+    document.getElementById('previewName').textContent = name;
+    document.getElementById('previewCity').textContent = city;
+    document.getElementById('previewDesc').innerHTML = desc || '<span class="preview-empty">Aucune description</span>';
+    document.getElementById('previewMapLabel').textContent = city !== 'Ville' ? `📍 ${city}` : 'Apparaîtra sur la carte';
+    const oEl = document.getElementById('previewOffers');
+    oEl.innerHTML = offerSkills.length ? offerSkills.map(s => `<span class="preview-tag" style="background:var(--blue-light);color:var(--blue-dark)">${s}</span>`).join('') : '<span class="preview-empty">Aucune compétence</span>';
+    const nEl = document.getElementById('previewNeeds');
+    nEl.innerHTML = needSkills.length ? needSkills.map(s => `<span class="preview-tag" style="background:var(--orange-light);color:#c47300">${s}</span>`).join('') : '<span class="preview-empty">Aucune compétence</span>';
+  }
+
+  // ---- SUBMIT ----
+  function submitSignup() {
+    showToast('🎉 Profil créé ! Bienvenue sur Troclab !');
+    setTimeout(() => showView('profile', document.querySelectorAll('.view-btn')[1]), 1200);
+  }
+
+  // ---- VIEW SWITCH ----
+  function showView(view, btn) {
+    document.getElementById('signupView').style.display = view === 'signup' ? 'block' : 'none';
+    document.getElementById('profileView').style.display = view === 'profile' ? 'block' : 'none';
+    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    else document.querySelectorAll('.view-btn')[view === 'signup' ? 0 : 1].classList.add('active');
+  }
+
+  // ---- TOAST ----
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 3000);
+  }
+
+  // ---- INIT ----
+  initAvatars();
+  initSuggestions();
+  updatePreview();
+</script>
+</body>
+</html>
