@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Troclab – Carte des échanges</title>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #0099ff;
+      --blue-dark: #0077cc;
+      --orange: #d6965e;
+      --orange-light: #faa75f;
+      --bg: #f0f4fa;
+      --white: #ffffff;
+      --text: #222;
+      --muted: #666;
+      --border: #dde3ef;
+      --card-shadow: 0 4px 24px rgba(0,120,255,0.08);
+    }
+
+    body {
+      font-family: 'Figtree', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 60px;
+    }
+    .nav-logo {
+      font-size: 1.3rem; font-weight: 900; letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .nav-logo span { color: var(--blue); }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a {
+      text-decoration: none; color: var(--muted);
+      font-size: 0.9rem; font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--blue); }
+    .nav-cta {
+      background: var(--blue); color: white;
+      border: none; border-radius: 8px;
+      padding: 8px 20px; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; font-family: 'Figtree', sans-serif;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .nav-cta:hover { background: var(--blue-dark); transform: translateY(-1px); }
+
+    /* LAYOUT */
+    .app {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      height: 100vh;
+      padding-top: 60px;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .sidebar-header {
+      padding: 20px 20px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-header h2 {
+      font-size: 1.05rem; font-weight: 700; margin-bottom: 12px;
+    }
+    .search-bar {
+      position: relative;
+    }
+    .search-bar input {
+      width: 100%; padding: 10px 14px 10px 38px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'Figtree', sans-serif; font-size: 0.88rem;
+      background: var(--bg); color: var(--text);
+      outline: none; transition: border-color 0.2s;
+    }
+    .search-bar input:focus { border-color: var(--blue); }
+    .search-bar .icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); font-size: 1rem;
+    }
+
+    /* FILTERS */
+    .filters {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .filter-label {
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--muted);
+    }
+    .filter-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      padding: 5px 12px; border-radius: 20px; font-size: 0.8rem;
+      font-weight: 600; cursor: pointer; border: 1.5px solid var(--border);
+      background: var(--white); color: var(--muted);
+      transition: all 0.15s; font-family: 'Figtree', sans-serif;
+    }
+    .tag:hover { border-color: var(--blue); color: var(--blue); }
+    .tag.active { background: var(--blue); border-color: var(--blue); color: white; }
+    .tag.orange.active { background: var(--orange); border-color: var(--orange); color: white; }
+
+    /* RESULTS LIST */
+    .results {
+      flex: 1; overflow-y: auto; padding: 12px;
+    }
+    .results::-webkit-scrollbar { width: 4px; }
+    .results::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .result-count {
+      font-size: 0.78rem; color: var(--muted); font-weight: 500;
+      padding: 4px 8px 12px;
+    }
+
+    .org-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 14px;
+      margin-bottom: 8px; cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .org-card:hover, .org-card.selected {
+      border-color: var(--blue);
+      box-shadow: var(--card-shadow);
+      transform: translateX(2px);
+    }
+    .org-card.selected { background: #f0f8ff; }
+
+    .org-top { display: flex; align-items: flex-start; gap: 10px; }
+    .org-avatar {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .org-info { flex: 1; min-width: 0; }
+    .org-name {
+      font-size: 0.92rem; font-weight: 700;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .org-location {
+      font-size: 0.78rem; color: var(--muted); margin-top: 1px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .profile-badge {
+      font-size: 0.7rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 6px; margin-left: auto;
+    }
+    .badge-maker { background: #e8f4ff; color: var(--blue); }
+    .badge-thinker { background: #fff3e8; color: var(--orange); }
+
+    .org-offers {
+      margin-top: 10px; display: flex; flex-wrap: wrap; gap: 4px;
+    }
+    .skill-tag {
+      font-size: 0.72rem; padding: 3px 8px; border-radius: 6px;
+      font-weight: 600;
+    }
+    .skill-offer { background: #e8f4ff; color: #0077cc; }
+    .skill-need { background: #fff3e8; color: #c47300; }
+
+    .org-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border);
+    }
+    .match-score {
+      font-size: 0.75rem; font-weight: 700; color: #2ea04d;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .contact-btn {
+      font-size: 0.75rem; font-weight: 700; padding: 5px 12px;
+      background: var(--blue); color: white; border: none;
+      border-radius: 7px; cursor: pointer;
+      font-family: 'Figtree', sans-serif;
+      transition: background 0.2s;
+    }
+    .contact-btn:hover { background: var(--blue-dark); }
+
+    /* MAP AREA */
+    .map-area {
+      position: relative; overflow: hidden;
+      background: #e8eef8;
+    }
+
+    /* SVG MAP */
+    .map-svg-wrap {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    svg.france-map {
+      width: 100%; height: 100%;
+      max-height: calc(100vh - 60px);
+    }
+
+    /* MAP PINS */
+    .map-pin {
+      cursor: pointer;
+      transition: transform 0.2s;
+      transform-origin: center bottom;
+    }
+    .map-pin:hover { transform: scale(1.2); }
+    .map-pin.selected { transform: scale(1.3); }
+
+    .pin-circle {
+      transition: all 0.2s;
+    }
+    .pin-pulse {
+      animation: pulse 2s infinite;
+      transform-origin: center;
+    }
+    @keyframes pulse {
+      0% { r: 14; opacity: 0.4; }
+      50% { r: 22; opacity: 0; }
+      100% { r: 14; opacity: 0.4; }
+    }
+
+    /* POPUP */
+    .map-popup {
+      position: absolute; background: white;
+      border-radius: 16px; padding: 18px 20px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+      border: 1.5px solid var(--border);
+      min-width: 260px; max-width: 300px;
+      z-index: 50;
+      animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: auto;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.8) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .popup-close {
+      position: absolute; top: 10px; right: 12px;
+      background: none; border: none; cursor: pointer;
+      font-size: 1.1rem; color: var(--muted); line-height: 1;
+    }
+    .popup-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .popup-avatar {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .popup-name { font-size: 1rem; font-weight: 700; }
+    .popup-loc { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    .popup-section { margin-bottom: 8px; }
+    .popup-section-title {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px;
+    }
+    .popup-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .popup-actions { margin-top: 14px; display: flex; gap: 8px; }
+    .btn-primary {
+      flex: 1; padding: 9px; background: var(--blue); color: white;
+      border: none; border-radius: 9px; font-weight: 700; font-size: 0.85rem;
+      cursor: pointer; font-family: 'Figtree', sans-serif;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--blue-dark); }
+    .btn-secondary {
+      padding: 9px 14px; background: var(--bg); color: var(--text);
+      border: 1.5px solid var(--border); border-radius: 9px;
+      font-weight: 600; font-size: 0.85rem; cursor: pointer;
+      font-family: 'Figtree', sans-serif; transition: border-color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* MAP LEGEND */
+    .map-legend {
+      position: absolute; bottom: 20px; right: 20px;
+      background: white; border-radius: 12px; padding: 12px 16px;
+      border: 1px solid var(--border); font-size: 0.78rem;
+      box-shadow: var(--card-shadow);
+    }
+    .legend-title { font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; color: var(--muted); }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+
+    /* MAP COUNTER */
+    .map-counter {
+      position: absolute; top: 20px; right: 20px;
+      background: white; border-radius: 12px; padding: 10px 16px;
+      border: 1px solid var(--border); box-shadow: var(--card-shadow);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .counter-num { font-size: 1.4rem; font-weight: 900; color: var(--blue); }
+    .counter-label { font-size: 0.8rem; color: var(--muted); font-weight: 500; line-height: 1.3; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: #1a1a2e; color: white; padding: 12px 24px;
+      border-radius: 40px; font-size: 0.88rem; font-weight: 600;
+      z-index: 999; box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      animation: slideUp 0.3s ease; display: none;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Troc<span>lab</span></div>
+  <div class="nav-links">
+    <a href="#">À propos</a>
+    <a href="#" style="color:var(--blue)">Carte</a>
+    <a href="#">Contact</a>
+    <button class="nav-cta">Se connecter</button>
+  </div>
+</nav>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Trouver un partenaire</h2>
+      <div class="search-bar">
+        <span class="icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Rechercher une compétence, ville…" oninput="filterCards()">
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="filter-label">Profil</div>
+      <div class="filter-tags" id="profileFilter">
+        <button class="tag active" onclick="toggleFilter(this,'profile','all')">Tous</button>
+        <button class="tag" onclick="toggleFilter(this,'profile','maker')">🛠 Maker</button>
+        <button class="tag" onclick="toggleFilter(this,'profile','thinker')">💡 Thinker</button>
+      </div>
+      <div class="filter-label">Domaine</div>
+      <div class="filter-tags" id="domainFilter">
+        <button class="tag active" onclick="toggleFilter(this,'domain','all')">Tous</button>
+        <button class="tag" onclick="toggleFilter(this,'domain','fabrication')">Fabrication</button>
+        <button class="tag" onclick="toggleFilter(this,'domain','numérique')">Numérique</button>
+        <button class="tag" onclick="toggleFilter(this,'domain','gouvernance')">Gouvernance</button>
+        <button class="tag" onclick="toggleFilter(this,'domain','pédagogie')">Pédagogie</button>
+      </div>
+    </div>
+
+    <div class="results">
+      <div class="result-count" id="resultCount">8 organisations trouvées</div>
+      <div id="cardList"></div>
+    </div>
+  </aside>
+
+  <!-- MAP -->
+  <main class="map-area" id="mapArea">
+    <div class="map-svg-wrap">
+      <!-- Simple stylized France map with pins -->
+      <svg class="france-map" viewBox="0 0 700 620" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(0,100,200,0.12)"/>
+          </filter>
+          <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" stop-color="#dce8f8"/>
+            <stop offset="100%" stop-color="#c8d8ee"/>
+          </radialGradient>
+        </defs>
+
+        <!-- background -->
+        <rect width="700" height="620" fill="url(#bgGrad)"/>
+
+        <!-- stylized France shape -->
+        <path d="M 200 80 L 240 60 L 310 55 L 380 65 L 430 80 L 470 110 L 500 140 L 510 180 L 500 220 L 520 260 L 510 300 L 480 330 L 490 370 L 460 410 L 420 440 L 380 460 L 340 470 L 300 460 L 260 450 L 220 430 L 190 400 L 170 360 L 150 320 L 140 280 L 130 240 L 140 200 L 150 160 L 170 120 Z"
+              fill="white" stroke="#b8ccdf" stroke-width="2" filter="url(#shadow)"/>
+
+        <!-- Region boundaries (simplified) -->
+        <path d="M 200 200 L 350 190 L 400 280 L 300 320 L 200 280 Z" fill="none" stroke="#d0ddf0" stroke-width="1" stroke-dasharray="4,4"/>
+        <path d="M 300 180 L 420 170 L 460 250 L 380 300 L 300 260 Z" fill="none" stroke="#d0ddf0" stroke-width="1" stroke-dasharray="4,4"/>
+        <path d="M 180 280 L 320 280 L 340 380 L 220 400 L 170 350 Z" fill="none" stroke="#d0ddf0" stroke-width="1" stroke-dasharray="4,4"/>
+        <path d="M 340 280 L 470 270 L 480 360 L 380 400 L 330 370 Z" fill="none" stroke="#d0ddf0" stroke-width="1" stroke-dasharray="4,4"/>
+
+        <!-- City labels -->
+        <text x="295" y="215" font-family="Figtree,sans-serif" font-size="11" fill="#8899aa" font-weight="500">Paris</text>
+        <text x="175" y="345" font-family="Figtree,sans-serif" font-size="10" fill="#8899aa">Bordeaux</text>
+        <text x="390" y="315" font-family="Figtree,sans-serif" font-size="10" fill="#8899aa">Lyon</text>
+        <text x="200" y="265" font-family="Figtree,sans-serif" font-size="10" fill="#8899aa">Nantes</text>
+        <text x="350" y="420" font-family="Figtree,sans-serif" font-size="10" fill="#8899aa">Marseille</text>
+        <text x="270" y="145" font-family="Figtree,sans-serif" font-size="10" fill="#8899aa">Lille</text>
+        <text x="420" y="200" font-family="Figtree,sans-serif" font-size="10" fill="#8899aa">Strasbourg</text>
+
+        <!-- PINS (rendered by JS) -->
+        <g id="pinsLayer"></g>
+      </svg>
+    </div>
+
+    <!-- Popup -->
+    <div class="map-popup" id="mapPopup" style="display:none; left:0; top:0;"></div>
+
+    <!-- Legend -->
+    <div class="map-legend">
+      <div class="legend-title">Légende</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#0099ff"></div> Maker</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#d6965e"></div> Thinker</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#2ea04d"></div> Les deux</div>
+    </div>
+
+    <!-- Counter -->
+    <div class="map-counter">
+      <div class="counter-num" id="counterNum">8</div>
+      <div class="counter-label">organisations<br>actives</div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ---- DATA ----
+const orgs = [
+  {
+    id: 1, name: "FabLab Nantes", city: "Nantes", region: "Pays de la Loire",
+    type: "maker", emoji: "🏭",
+    color: "#0099ff",
+    offers: ["Impression 3D", "Découpe laser", "Arduino"],
+    needs: ["Gouvernance", "Pédagogie"],
+    match: 92,
+    x: 220, y: 270,
+    domains: ["fabrication", "numérique"]
+  },
+  {
+    id: 2, name: "Tiers-Lieu Bordeaux", city: "Bordeaux", region: "Nouvelle-Aquitaine",
+    type: "thinker", emoji: "🌿",
+    color: "#d6965e",
+    offers: ["Design thinking", "Facilitation", "Gouvernance"],
+    needs: ["Numérique", "Fabrication"],
+    match: 87,
+    x: 200, y: 360,
+    domains: ["gouvernance", "pédagogie"]
+  },
+  {
+    id: 3, name: "MixLab Lyon", city: "Lyon", region: "Auvergne-Rhône-Alpes",
+    type: "both", emoji: "⚡",
+    color: "#2ea04d",
+    offers: ["Électronique", "Médiation numérique", "Ateliers"],
+    needs: ["Communication", "Gouvernance"],
+    match: 95,
+    x: 400, y: 305,
+    domains: ["fabrication", "numérique", "pédagogie"]
+  },
+  {
+    id: 4, name: "Collectif Commun", city: "Paris", region: "Île-de-France",
+    type: "thinker", emoji: "💡",
+    color: "#d6965e",
+    offers: ["Formation ESS", "Gouvernance horizontale"],
+    needs: ["Maker skills", "Prototypage"],
+    match: 78,
+    x: 305, y: 205,
+    domains: ["gouvernance", "pédagogie"]
+  },
+  {
+    id: 5, name: "OpenFab Lille", city: "Lille", region: "Hauts-de-France",
+    type: "maker", emoji: "🔧",
+    color: "#0099ff",
+    offers: ["CNC", "Soudure", "Couture numérique"],
+    needs: ["Pédagogie", "Facilitation"],
+    match: 83,
+    x: 285, y: 135,
+    domains: ["fabrication"]
+  },
+  {
+    id: 6, name: "HackLab Strasbourg", city: "Strasbourg", region: "Grand Est",
+    type: "maker", emoji: "💻",
+    color: "#0099ff",
+    offers: ["Dev web", "Cybersécurité", "Linux"],
+    needs: ["Gouvernance", "ESS"],
+    match: 76,
+    x: 430, y: 185,
+    domains: ["numérique"]
+  },
+  {
+    id: 7, name: "Lab'oratoire", city: "Marseille", region: "PACA",
+    type: "both", emoji: "🌊",
+    color: "#2ea04d",
+    offers: ["Fabrication textile", "Sérigraphie", "Pédagogie"],
+    needs: ["Arduino", "Découpe laser"],
+    match: 89,
+    x: 380, y: 420,
+    domains: ["fabrication", "pédagogie"]
+  },
+  {
+    id: 8, name: "Réseau Savoir-Faire", city: "Rennes", region: "Bretagne",
+    type: "thinker", emoji: "🤝",
+    color: "#d6965e",
+    offers: ["Médiation", "Animation territoriale", "RERS"],
+    needs: ["Outils numériques", "Maker tools"],
+    match: 81,
+    x: 170, y: 220,
+    domains: ["gouvernance", "pédagogie"]
+  }
+];
+
+let filters = { profile: 'all', domain: 'all' };
+let selectedId = null;
+
+// ---- RENDER CARDS ----
+function renderCards(data) {
+  const list = document.getElementById('cardList');
+  document.getElementById('resultCount').textContent = `${data.length} organisation${data.length > 1 ? 's' : ''} trouvée${data.length > 1 ? 's' : ''}`;
+  document.getElementById('counterNum').textContent = data.length;
+  list.innerHTML = data.map(org => `
+    <div class="org-card ${selectedId === org.id ? 'selected' : ''}" onclick="selectOrg(${org.id})" id="card-${org.id}">
+      <div class="org-top">
+        <div class="org-avatar" style="background:${org.color}22">${org.emoji}</div>
+        <div class="org-info">
+          <div class="org-name">${org.name}</div>
+          <div class="org-location">📍 ${org.city}</div>
+        </div>
+        <div class="profile-badge ${org.type === 'maker' ? 'badge-maker' : org.type === 'thinker' ? 'badge-thinker' : 'badge-maker'}">
+          ${org.type === 'maker' ? '🛠 Maker' : org.type === 'thinker' ? '💡 Thinker' : '⚡ Hybride'}
+        </div>
+      </div>
+      <div class="org-offers">
+        ${org.offers.map(s => `<span class="skill-tag skill-offer">✦ ${s}</span>`).join('')}
+        ${org.needs.map(s => `<span class="skill-tag skill-need">◇ ${s}</span>`).join('')}
+      </div>
+      <div class="org-bottom">
+        <div class="match-score">✓ ${org.match}% compatible</div>
+        <button class="contact-btn" onclick="event.stopPropagation(); contactOrg(${org.id})">Contacter</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ---- RENDER PINS ----
+function renderPins(data) {
+  const layer = document.getElementById('pinsLayer');
+  const ids = new Set(data.map(o => o.id));
+
+  layer.innerHTML = orgs.map(org => {
+    const visible = ids.has(org.id);
+    const isSelected = selectedId === org.id;
+    const color = org.color;
+    return `
+      <g class="map-pin ${isSelected ? 'selected' : ''}" id="pin-${org.id}"
+         onclick="selectOrg(${org.id})"
+         style="opacity:${visible ? 1 : 0.2}; pointer-events:${visible ? 'all' : 'none'}">
+        ${isSelected ? `<circle class="pin-pulse" cx="${org.x}" cy="${org.y}" r="14" fill="${color}" opacity="0.25"/>` : ''}
+        <circle class="pin-circle" cx="${org.x}" cy="${org.y}" r="${isSelected ? 16 : 13}"
+                fill="${color}" stroke="white" stroke-width="2.5"
+                style="filter:drop-shadow(0 2px 6px ${color}66)"/>
+        <text x="${org.x}" y="${org.y + 5}" text-anchor="middle"
+              font-size="${isSelected ? 13 : 11}" font-family="serif">${org.emoji}</text>
+      </g>
+    `;
+  }).join('');
+}
+
+// ---- SELECT ORG ----
+function selectOrg(id) {
+  if (selectedId === id) {
+    selectedId = null;
+    document.getElementById('mapPopup').style.display = 'none';
+  } else {
+    selectedId = id;
+    showPopup(id);
+    // scroll card into view
+    const card = document.getElementById(`card-${id}`);
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  render();
+}
+
+// ---- SHOW POPUP ----
+function showPopup(id) {
+  const org = orgs.find(o => o.id === id);
+  const popup = document.getElementById('mapPopup');
+  popup.style.display = 'block';
+  popup.innerHTML = `
+    <button class="popup-close" onclick="closePopup()">✕</button>
+    <div class="popup-header">
+      <div class="popup-avatar" style="background:${org.color}22">${org.emoji}</div>
+      <div>
+        <div class="popup-name">${org.name}</div>
+        <div class="popup-loc">📍 ${org.city} · ${org.region}</div>
+      </div>
+    </div>
+    <div class="popup-section">
+      <div class="popup-section-title">✦ Ce qu'ils proposent</div>
+      <div class="popup-tags">${org.offers.map(s => `<span class="skill-tag skill-offer">${s}</span>`).join('')}</div>
+    </div>
+    <div class="popup-section">
+      <div class="popup-section-title">◇ Ce qu'ils cherchent</div>
+      <div class="popup-tags">${org.needs.map(s => `<span class="skill-tag skill-need">${s}</span>`).join('')}</div>
+    </div>
+    <div class="match-score" style="margin-bottom:6px">✓ ${org.match}% de compatibilité avec votre profil</div>
+    <div class="popup-actions">
+      <button class="btn-primary" onclick="contactOrg(${org.id})">📬 Proposer un échange</button>
+      <button class="btn-secondary" onclick="closePopup()">Voir profil</button>
+    </div>
+  `;
+
+  // Position popup near pin but within viewport
+  const mapArea = document.getElementById('mapArea');
+  const rect = mapArea.getBoundingClientRect();
+  const svgW = 700, svgH = 620;
+  const scaleX = rect.width / svgW;
+  const scaleY = rect.height / svgH;
+  let px = org.x * scaleX - 130;
+  let py = (org.y - 30) * scaleY - 60;
+  px = Math.max(10, Math.min(rect.width - 320, px));
+  py = Math.max(70, Math.min(rect.height - 300, py));
+  popup.style.left = px + 'px';
+  popup.style.top = py + 'px';
+}
+
+function closePopup() {
+  selectedId = null;
+  document.getElementById('mapPopup').style.display = 'none';
+  render();
+}
+
+// ---- FILTER ----
+function toggleFilter(btn, type, value) {
+  filters[type] = value;
+  const group = btn.parentElement;
+  group.querySelectorAll('.tag').forEach(t => t.classList.remove('active', 'orange'));
+  btn.classList.add('active');
+  if (type === 'domain' && value !== 'all') btn.classList.add('orange');
+  render();
+}
+
+function filterCards() {
+  render();
+}
+
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  return orgs.filter(org => {
+    const matchProfile = filters.profile === 'all' || org.type === filters.profile || (filters.profile === 'maker' && org.type === 'both') || (filters.profile === 'thinker' && org.type === 'both');
+    const matchDomain = filters.domain === 'all' || org.domains.includes(filters.domain);
+    const matchQ = !q || org.name.toLowerCase().includes(q) || org.city.toLowerCase().includes(q) || org.offers.some(s => s.toLowerCase().includes(q)) || org.needs.some(s => s.toLowerCase().includes(q));
+    return matchProfile && matchDomain && matchQ;
+  });
+}
+
+function render() {
+  const filtered = getFiltered();
+  renderCards(filtered);
+  renderPins(filtered);
+}
+
+// ---- CONTACT ----
+function contactOrg(id) {
+  const org = orgs.find(o => o.id === id);
+  showToast(`✉️ Demande envoyée à ${org.name} !`);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+
+// ---- INIT ----
+render();
+</script>
+</body>
+</html>
