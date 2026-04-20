@@ -1,9 +1,16 @@
 {
-  "dependencies": {
-    "@supabase/supabase-js": "^2.104.0",
-    "dotenv": "^17.4.2"
-  },
+  "name": "troclab",
+  "version": "1.0.0",
   "scripts": {
-    "start": "node troclab/backend/server.js"
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.0"
   }
 }
