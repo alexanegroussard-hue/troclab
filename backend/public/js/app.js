@@ -556,7 +556,7 @@ function renderLogin(app) {
           </div>
           <button class="btn btn--primary w-full" id="login-btn" onclick="submitLogin()">Se connecter</button>
           <p class="text-muted font-ui" style="font-size:0.78rem;text-align:center;margin-top:var(--space-md)">
-            Comptes démo : alice@fablab-paris.org / demo1234
+            Comptes démo : alice@fablab-paris.org / password
           </p>
         </div>
       </div>
