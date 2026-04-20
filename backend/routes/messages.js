@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/', auth, async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('chat_messagess')
+      .from('chat_messages')
       .select('*, sender:users!chat_messagess_sender_id_fkey(name, organisation, avatar_color)')
       .eq('recipient_id', req.user.id)
       .order('created_at', { ascending: false });
@@ -34,7 +34,7 @@ router.get('/', auth, async (req, res) => {
 router.get('/sent', auth, async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('chat_messagess')
+      .from('chat_messages')
       .select('*, recipient:users!chat_messagess_recipient_id_fkey(name, organisation)')
       .eq('sender_id', req.user.id)
       .order('created_at', { ascending: false });
@@ -58,7 +58,7 @@ router.get('/sent', auth, async (req, res) => {
 router.get('/unread-count', auth, async (req, res) => {
   try {
     const { count, error } = await supabase
-      .from('chat_messagess')
+      .from('chat_messages')
       .select('*', { count: 'exact', head: true })
       .eq('recipient_id', req.user.id)
       .eq('read', false);
@@ -81,7 +81,7 @@ router.post('/', auth, async (req, res) => {
     const recipient = await get('users', { id: recipient_id });
     if (!recipient) return res.status(404).json({ error: 'Destinataire introuvable' });
 
-    const chat_messages = await insert('chat_messagess', {
+    const chat_messages = await insert('chat_messages', {
       id: uuidv4(),
       sender_id: req.user.id,
       recipient_id,
@@ -100,7 +100,7 @@ router.post('/', auth, async (req, res) => {
 // PUT /api/chat_messagess/:id/read
 router.put('/:id/read', auth, async (req, res) => {
   try {
-    await update('chat_messagess', { id: req.params.id, recipient_id: req.user.id }, { read: true });
+    await update('chat_messages', { id: req.params.id, recipient_id: req.user.id }, { read: true });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.chat_messages });
