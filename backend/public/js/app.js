@@ -410,6 +410,9 @@ async function renderCarte(app) {
 
   const orgColors = { fablab: '#2D6A4F', association: '#457B9D', coop: '#E76F51', 'tiers-lieu': '#9B2335', ess: '#6B705C', autre: '#4A4E69' };
 
+  let formations = [];
+  try { formations = await Formations.list(); } catch {}
+
   users.forEach(u => {
     const color = u.avatar_color || orgColors[u.organisation_type] || '#2D6A4F';
     const icon = L.divIcon({
@@ -420,14 +423,21 @@ async function renderCarte(app) {
     const anciennete = Math.floor((Date.now() - new Date(u.created_at)) / (1000 * 60 * 60 * 24 * 30));
     const moisLabel = anciennete < 1 ? 'Nouveau membre' : `Membre depuis ${anciennete} mois`;
 
+    const userFormations = formations.filter(f => f.user_id === u.id);
+    const offered = userFormations.filter(f => f.type === 'offered');
+    const wanted = userFormations.filter(f => f.type === 'wanted');
+
+    const offeredHtml = offered.length > 0 ? '<p style="margin-top:8px"><strong>🌱 Propose :</strong><br>' + offered.map(f => '• ' + f.title).join('<br>') + '</p>' : '';
+    const wantedHtml = wanted.length > 0 ? '<p style="margin-top:8px"><strong>🔍 Recherche :</strong><br>' + wanted.map(f => '• ' + f.title).join('<br>') + '</p>' : '';
+
     const popup = `
-      <div class="map-popup" style="min-width:200px;padding:4px">
+      <div class="map-popup" style="min-width:220px;padding:4px">
         <h4>${escapeHtml(u.organisation)}</h4>
         <span class="org-type">${orgTypeLabel(u.organisation_type)}</span>
         <p>📍 ${escapeHtml(u.city)}</p>
         <p>🕐 ${moisLabel}</p>
-        ${u.formations_offered_count > 0 ? `<p>🌱 ${u.formations_offered_count} formation(s) proposée(s)</p>` : ''}
-        ${u.formations_wanted_count > 0 ? `<p>🔍 ${u.formations_wanted_count} formation(s) recherchée(s)</p>` : ''}
+        ${offeredHtml}
+        ${wantedHtml}
         <a href="/profil/${u.id}" onclick="navigate('/profil/${u.id}');return false" style="color:var(--color-forest);font-family:var(--font-ui);font-size:0.82rem;font-weight:600;margin-top:8px;display:inline-block">Voir le profil →</a>
       </div>
     `;
