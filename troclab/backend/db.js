@@ -159,16 +159,16 @@ function seedData() {
 
   const formations = [
     // Alice - FabLab Paris
-    { id: uuidv4(), user_id: userIds[0], title: 'Initiation à l\'impression 3D', description: 'Découverte des bases de l\'impression 3D FDM : modélisation simple, tranchage, calibration d\'une imprimante. Matériel fourni.', category: 'Fabrication numérique', duration_hours: 4, max_participants: 6, type: 'offered' },
-    { id: uuidv4(), user_id: userIds[0], title: 'Découpe laser pour débutants', description: 'Prise en main d\'une machine de découpe laser. On aborde la conception de fichiers et la sécurité.', category: 'Fabrication numérique', duration_hours: 3, max_participants: 4, type: 'offered' },
-    { id: uuidv4(), user_id: userIds[0], title: 'Gestion bénévole et engagement', description: 'On cherche une formation pour mieux fidéliser et mobiliser nos bénévoles sur la durée.', category: 'Management associatif', duration_hours: 3, max_participants: 8, type: 'wanted' },
+    { id: uuidv4(), user_id: userIds[0], title: 'Initiation à l\'impression 3D', description: 'Découverte des bases de l\'impression 3D FDM : modélisation simple, tranchage, calibration d\'une imprimante. Matériel fourni.', category: 'Fabrication num.', duration_hours: 4, max_participants: 6, type: 'offered' },
+    { id: uuidv4(), user_id: userIds[0], title: 'Découpe laser pour débutants', description: 'Prise en main d\'une machine de découpe laser. On aborde la conception de fichiers et la sécurité.', category: 'Fabrication num.', duration_hours: 3, max_participants: 4, type: 'offered' },
+    { id: uuidv4(), user_id: userIds[0], title: 'Gestion bénévole et engagement', description: 'On cherche une formation pour mieux fidéliser et mobiliser nos bénévoles sur la durée.', category: 'Manag. associatif', duration_hours: 3, max_participants: 8, type: 'wanted' },
 
     // Benjamin - Réseau Solidaire
-    { id: uuidv4(), user_id: userIds[1], title: 'Ateliers insertion numérique', description: 'Ateliers pratiques pour des publics éloignés du numérique : email, démarches en ligne, smartphone.', category: 'Numérique inclusif', duration_hours: 2, max_participants: 8, type: 'offered' },
-    { id: uuidv4(), user_id: userIds[1], title: 'Création de site web associatif', description: 'On cherche une formation pour créer notre propre site web sans coder.', category: 'Communication', duration_hours: 4, max_participants: 5, type: 'wanted' },
+    { id: uuidv4(), user_id: userIds[1], title: 'Ateliers insertion numérique', description: 'Ateliers pratiques pour des publics éloignés du numérique : email, démarches en ligne, smartphone.', category: 'Num. inclusif', duration_hours: 2, max_participants: 8, type: 'offered' },
+    { id: uuidv4(), user_id: userIds[1], title: 'Création de site web associatif', description: 'On cherche une formation pour créer notre propre site web sans coder.', category: 'Comm.', duration_hours: 4, max_participants: 5, type: 'wanted' },
 
     // Célia - EcoSol Lyon
-    { id: uuidv4(), user_id: userIds[2], title: 'Communication non-violente en équipe', description: 'Atelier pratique sur la CNV pour améliorer la communication interne des structures collectives.', category: 'Communication', duration_hours: 6, max_participants: 12, type: 'offered' },
+    { id: uuidv4(), user_id: userIds[2], title: 'Communication non-violente en équipe', description: 'Atelier pratique sur la CNV pour améliorer la communication interne des structures collectives.', category: 'Comm.', duration_hours: 6, max_participants: 12, type: 'offered' },
     { id: uuidv4(), user_id: userIds[2], title: 'Comptabilité associative simplifiée', description: 'Bases de la compta asso : bilan, compte de résultat, suivi budgétaire. Pour les trésoriers non-comptables.', category: 'Gestion', duration_hours: 4, max_participants: 8, type: 'offered' },
     { id: uuidv4(), user_id: userIds[2], title: 'Fabrication de mobilier upcyclé', description: 'On voudrait apprendre à fabriquer du mobilier à partir de palettes et matériaux récupérés.', category: 'Fabrication', duration_hours: 8, max_participants: 6, type: 'wanted' },
 
@@ -177,7 +177,7 @@ function seedData() {
     { id: uuidv4(), user_id: userIds[3], title: 'Montage de dossiers de subvention', description: 'On cherche une formation pour apprendre à rédiger des dossiers de demande de subvention.', category: 'Gestion', duration_hours: 3, max_participants: 6, type: 'wanted' },
 
     // Emma - Tiers-Lieu Bordeaux
-    { id: uuidv4(), user_id: userIds[4], title: 'Maraîchage urbain et permaculture', description: 'Introduction à la permaculture appliquée aux espaces urbains : potager sur toit, jardinage en bacs.', category: 'Écologie pratique', duration_hours: 4, max_participants: 8, type: 'offered' },
+    { id: uuidv4(), user_id: userIds[4], title: 'Maraîchage urbain et permaculture', description: 'Introduction à la permaculture appliquée aux espaces urbains : potager sur toit, jardinage en bacs.', category: 'Écolo. pratique', duration_hours: 4, max_participants: 8, type: 'offered' },
     { id: uuidv4(), user_id: userIds[4], title: 'Gestion de projet Agile pour associations', description: 'Méthode Kanban et Agile adaptées aux structures associatives. Outils libres et gratuits.', category: 'Gestion de projet', duration_hours: 3, max_participants: 10, type: 'offered' },
     { id: uuidv4(), user_id: userIds[4], title: 'Sérigraphie textile', description: 'On cherche une initiation à la sérigraphie pour créer nos propres supports de communication textiles.', category: 'Arts appliqués', duration_hours: 5, max_participants: 6, type: 'wanted' },
   ];

@@ -719,7 +719,7 @@ async function renderDashboard(app) {
     [freshUser, formations, exchanges] = await Promise.all([
       Auth.me(), Formations.mine(), Exchanges.list()
     ]);
-    Session.save(null, freshUser); // Mettre à jour le cache (on garde le token)
+    localStorage.setItem('troclab_user', JSON.stringify(freshUser)); // Mettre à jour le cache (on garde le token)
     localStorage.setItem('troclab_user', JSON.stringify(freshUser));
   } catch {
     freshUser = user;
@@ -1088,19 +1088,37 @@ async function renderMessages(app) {
 
     const detail = document.getElementById('msg-detail');
     detail.innerHTML = `
-      <div class="message-detail__header">
-        <h4>${escapeHtml(msg.subject || '(sans objet)')}</h4>
-        <div class="text-muted text-small font-ui mt-sm">
-          ${tab === 'inbox' ? `De : <strong>${escapeHtml(msg.sender_name||'')}</strong>` : `À : <strong>${escapeHtml(msg.recipient_name||'')}</strong>`}
-          · ${formatDate(msg.created_at)}
-        </div>
-        ${tab === 'inbox' && msg.sender_id ? `
-          <button onclick="openMessageCompose('${msg.sender_id}','${escapeHtml(msg.sender_name||'')}','RE: ${escapeHtml(msg.subject||'')}')"
-            class="btn btn--ghost btn--sm mt-md">↩ Répondre</button>` : ''}
+  <div class="message-detail__header">
+    <h4>${escapeHtml(msg.subject || '(sans objet)')}</h4>
+    <div class="text-muted text-small font-ui mt-sm">
+      ${tab === 'inbox' ? `De : <strong>${escapeHtml(msg.sender_name||'')}</strong>` : `À : <strong>${escapeHtml(msg.recipient_name||'')}</strong>`}
+      · ${formatDate(msg.created_at)}
+    </div>
+  </div>
+  <div style="line-height:1.8;font-size:0.95rem;white-space:pre-wrap;margin-bottom:var(--space-xl)">${escapeHtml(msg.body)}</div>
+  ${tab === 'inbox' && msg.sender_id ? `
+    <div style="border-top:1px solid var(--color-border);padding-top:var(--space-lg)">
+      <div class="form-group mb-md">
+        <label class="form-label">Répondre à ${escapeHtml(msg.sender_name||'')}</label>
+        <textarea class="form-textarea w-full" id="reply-body" rows="4" placeholder="Votre réponse…"></textarea>
       </div>
-      <div style="line-height:1.8;font-size:0.95rem;white-space:pre-wrap">${escapeHtml(msg.body)}</div>
-    `;
+      <button class="btn btn--primary" onclick="submitReply('${msg.sender_id}','RE: ${escapeHtml(msg.subject||'')}')">Envoyer la réponse</button>
+    </div>
+  ` : ''}
+`;
   };
+window.submitReply = async (recipientId, subject) => {
+  const body = document.getElementById('reply-body')?.value.trim();
+  if (!body) { Toast.error('Écrivez un message'); return; }
+  try {
+    await Messages.send({ recipient_id: recipientId, subject, body });
+    Toast.success('Réponse envoyée !');
+    document.getElementById('reply-body').value = '';
+  } catch (err) {
+    Toast.error(err.message);
+  }
+};
+
 }
 
 // =============================================
@@ -1290,14 +1308,22 @@ async function updateExchangeStatus(id, status) {
 }
 
 // --- Message ---
-function openMessageCompose(recipientId = '', recipientName = '', subject = '') {
+async function openMessageCompose(recipientId = '', recipientName = '', subject = '') {
   if (!Session.isLoggedIn()) { navigate('/connexion'); return; }
+  
+  const currentUser = Session.getUser();
+  let users = [];
+  try { users = await Users.list(); } catch {}
+  const others = users.filter(u => u.id !== currentUser.id);
+
   Modal.show('Nouveau message', `
     <div id="msg-error"></div>
     <div class="form-group mb-md">
-      <label class="form-label">Destinataire ID</label>
-      <input class="form-input w-full" id="mc-recipient" value="${escapeHtml(recipientId)}" placeholder="ID de l'utilisateur" ${recipientId?'readonly':''}>
-      ${recipientName ? `<div class="form-hint mt-sm">→ ${escapeHtml(recipientName)}</div>` : ''}
+      <label class="form-label">Destinataire</label>
+      <select class="form-select w-full" id="mc-recipient">
+        <option value="">-- Choisir une structure --</option>
+        ${others.map(u => `<option value="${u.id}" ${u.id === recipientId ? 'selected' : ''}>${escapeHtml(u.organisation)} — ${escapeHtml(u.name)}</option>`).join('')}
+      </select>
     </div>
     <div class="form-group mb-md">
       <label class="form-label">Objet</label>

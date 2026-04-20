@@ -111,8 +111,8 @@ function orgTypeLabel(type) {
 }
 
 function formationTypeHTML(type) {
-  if (type === 'offered') return `<span class="formation-badge badge--offered">🌱 Proposée</span>`;
-  return `<span class="formation-badge badge--wanted">🔍 Recherchée</span>`;
+  if (type === 'offered') return `<span class="formation-badge badge--offered">Proposée</span>`;
+  return `<span class="formation-badge badge--wanted">Recherchée</span>`;
 }
 
 function exchangeStatusLabel(status) {
@@ -130,7 +130,7 @@ function exchangeStatusLabel(status) {
 function formationCardHTML(f, showActions = false, currentUserId = null) {
   const isOwn = f.user_id === currentUserId;
   return `
-    <div class="card card--formation">
+    <div class="card card--formation" style="gap:var(--space-sm)">
       <div class="flex items-center justify-between gap-md">
         ${formationTypeHTML(f.type)}
         <span class="category-tag">${f.category}</span>
@@ -144,23 +144,19 @@ function formationCardHTML(f, showActions = false, currentUserId = null) {
         <span>👥 ${f.max_participants} pers. max</span>
         ${f.city ? `<span>📍 ${escapeHtml(f.city)}</span>` : ''}
       </div>
-      ${f.user_name ? `
-        <div class="flex items-center gap-sm" style="padding-top:10px;border-top:1px solid var(--color-border)">
-          <div class="avatar avatar--sm" style="background:${f.avatar_color||'#2D6A4F'}">${avatarInitials(f.user_name)}</div>
-          <div>
-            <div class="font-ui text-small" style="font-weight:600">${escapeHtml(f.user_name)}</div>
-            <div class="font-ui" style="font-size:0.75rem;color:var(--color-text-muted)">${escapeHtml(f.organisation||'')}</div>
-          </div>
-          ${!isOwn && f.type === 'offered' ? `
-            <button onclick="openExchangeRequest('${f.id}','${f.user_id}','${escapeHtml(f.title)}')"
-              class="btn btn--primary btn--sm" style="margin-left:auto">Demander</button>
-          ` : ''}
-          ${!isOwn ? `
-            <button onclick="openMessageCompose('${f.user_id}','${escapeHtml(f.user_name)}')"
-              class="btn btn--ghost btn--sm" ${isOwn?'style="display:none"':''}>✉</button>
-          ` : ''}
-        </div>
-      ` : ''}
+${f.user_name ? `
+  <div style="padding-top:10px;border-top:1px solid var(--color-border);display:flex;align-items:center;gap:8px;min-width:0">
+    <div class="avatar avatar--sm" style="background:${f.avatar_color||'#2D6A4F'};flex-shrink:0">${avatarInitials(f.user_name)}</div>
+    <div style="min-width:0;flex:1;overflow:hidden">
+      <div class="font-ui text-small" style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(f.organisation||'')}</div>
+      <div class="font-ui" style="font-size:0.75rem;color:var(--color-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(f.user_name)}</div>
+    </div>
+${!isOwn ? `
+      <button onclick="openMessageCompose('${f.user_id}','${escapeHtml(f.user_name)}')"
+        class="btn btn--primary btn--sm" style="flex-shrink:0;margin-left:auto">✉</button>
+    ` : ''}
+  </div>
+` : ''}
       ${showActions && isOwn ? `
         <div class="flex gap-sm" style="padding-top:8px;border-top:1px solid var(--color-border)">
           <button onclick="editFormation('${f.id}')" class="btn btn--ghost btn--sm">Modifier</button>
