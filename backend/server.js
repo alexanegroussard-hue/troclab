@@ -22,7 +22,7 @@ app.use(cors({
 app.use(express.json());
 
 // Servir le frontend statique
-app.use(express.static('frontend/public'));
+app.use(express.static(path.join(__dirname, '../frontend/public')));
 
 // --- Initialiser la base de données avant de démarrer ---
 getDb().then(() => {
