@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrocLab — Échangez des formations entre structures</title>
+  <meta name="description" content="TrocLab est une plateforme de troc de formations entre structures associatives et solidaires : fablabs, associations, coopératives, tiers-lieux.">
+
+  <!-- Polices Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet pour la carte -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    /* Styles spécifiques à la page d'accueil */
+    .how-it-works {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: var(--space-xl);
+      counter-reset: steps;
+    }
+
+    .step {
+      text-align: center;
+      padding: var(--space-lg);
+    }
+
+    .step__icon {
+      width: 64px;
+      height: 64px;
+      background: var(--color-sage);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin: 0 auto var(--space-md);
+    }
+
+    .step h4 { margin-bottom: var(--space-sm); font-family: var(--font-display); }
+    .step p { font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.6; font-family: var(--font-ui); }
+
+    .balance-explainer {
+      background: var(--color-forest-dark);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: center;
+    }
+
+    @media (max-width: 640px) { .balance-explainer { grid-template-columns: 1fr; } }
+
+    .balance-visual {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .balance-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+    }
+
+    .balance-pill {
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .pill--green { background: var(--color-moss); color: var(--color-forest-dark); }
+    .pill--orange { background: var(--color-terracotta); color: white; }
+
+    /* Featured formations sur la home */
+    .featured-section { padding: var(--space-2xl) 0; background: var(--color-white); }
+
+    /* Footer */
+    footer {
+      background: var(--color-charcoal);
+      color: rgba(245, 240, 232, 0.8);
+      padding: var(--space-2xl) 0 var(--space-xl);
+      font-family: var(--font-ui);
+    }
+
+    footer .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-xl);
+    }
+
+    @media (max-width: 768px) { footer .footer-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 500px) { footer .footer-grid { grid-template-columns: 1fr; } }
+
+    footer h5 {
+      color: white;
+      font-family: var(--font-display);
+      margin-bottom: var(--space-md);
+      font-size: 1rem;
+    }
+
+    footer a {
+      display: block;
+      color: rgba(245, 240, 232, 0.7);
+      font-size: 0.875rem;
+      margin-bottom: 8px;
+      transition: color var(--transition);
+    }
+
+    footer a:hover { color: var(--color-moss); }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: rgba(245,240,232,0.5);
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--color-moss);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="navbar" id="navbar">
+  <div class="navbar__inner">
+    <a href="/" class="navbar__logo">
+      <span>⟳</span> TrocLab
+    </a>
+    <div class="navbar__links" id="nav-links">
+      <!-- Injecté par JS selon état connexion -->
+    </div>
+  </div>
+</nav>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- CONTENU PRINCIPAL (SPA) -->
+<main id="app"></main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">⟳ TrocLab</div>
+        <p style="font-size:0.875rem;margin-top:var(--space-md);line-height:1.7;max-width:280px">
+          Une plateforme de réciprocité pour les structures de l'économie sociale et solidaire. Formez-vous en formant les autres.
+        </p>
+      </div>
+      <div>
+        <h5>Plateforme</h5>
+        <a href="/catalogue">Catalogue</a>
+        <a href="/carte">Carte</a>
+        <a href="/about">À propos</a>
+      </div>
+      <div>
+        <h5>Compte</h5>
+        <a href="/connexion" id="footer-login-link">Connexion</a>
+        <a href="/inscription">Inscription</a>
+        <a href="/tableau-de-bord" id="footer-dash-link" class="hidden">Mon espace</a>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <a href="mailto:contact@troclab.fr">contact@troclab.fr</a>
+        <a href="/about#financement">Financement</a>
+        <a href="/about#mentions">Mentions légales</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 TrocLab — Plateforme libre et transparente</span>
+      <span>Fait avec soin pour l'ESS 🌱</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/ui.js"></script>
+<script src="/js/app.js"></script>
+
+</body>
+</html>
