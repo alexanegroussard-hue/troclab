@@ -35,6 +35,7 @@ router.get('/', auth, async (req, res) => {
 
     res.json(exchanges);
   } catch (err) {
+    console.error("EXCHANGES ERROR:", err.message, err.details || "");
     res.status(500).json({ error: err.message });
   }
 });
@@ -74,6 +75,7 @@ router.post('/', auth, async (req, res) => {
 
     res.status(201).json(exchange);
   } catch (err) {
+    console.error("EXCHANGES ERROR:", err.message, err.details || "");
     res.status(500).json({ error: err.message });
   }
 });
@@ -101,6 +103,7 @@ router.put('/:id/status', auth, async (req, res) => {
 
     res.json({ success: true, status });
   } catch (err) {
+    console.error("EXCHANGES ERROR:", err.message, err.details || "");
     res.status(500).json({ error: err.message });
   }
 });
