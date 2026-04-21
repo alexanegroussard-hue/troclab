@@ -77,11 +77,11 @@ http://localhost:3001
 
 | Email | Mot de passe | Structure |
 |-------|-------------|-----------|
-| alice@fablab-paris.org | demo1234 | FabLab Paris Centre |
-| ben@asso-solidaire.fr | demo1234 | Réseau Solidaire 13 |
-| celia@ecosol-lyon.coop | demo1234 | EcoSol Lyon |
-| david@maison-quartier.fr | demo1234 | Maison de Quartier Bellecour |
-| emma@tiers-lieu-bx.org | demo1234 | Tiers-Lieu Bordeaux Sud |
+| alice@fablab-paris.org | password | FabLab Paris Centre |
+| ben@asso-solidaire.fr | password | Réseau Solidaire 13 |
+| celia@ecosol-lyon.coop | password | EcoSol Lyon |
+| david@maison-quartier.fr | password | Maison de Quartier Bellecour |
+| emma@tiers-lieu-bx.org | password | Tiers-Lieu Bordeaux Sud |
 
 ---
 
