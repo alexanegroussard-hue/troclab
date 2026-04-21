@@ -1018,6 +1018,7 @@ async function renderProfil(app, params) {
 // PAGE : MESSAGES
 // =============================================
 async function renderMessages(app) {
+  const currentUser = Session.getUser();
   app.innerHTML = `
     <div class="section">
       <div class="container">
@@ -1026,20 +1027,17 @@ async function renderMessages(app) {
             <div class="section__eyebrow">Messagerie</div>
             <h2>Messages</h2>
           </div>
-          <button onclick="openMessageCompose()" class="btn btn--primary btn--sm">+ Nouveau message</button>
+          <div style="display:flex;gap:8px">
+            <button onclick="refreshMessages()" class="btn btn--sm">↻ Rafraichir</button>
+            <button onclick="openMessageCompose()" class="btn btn--primary btn--sm">+ Nouveau message</button>
+          </div>
         </div>
-
-        <div class="filters-bar" id="msg-tabs" style="margin-bottom:var(--space-lg)">
-          <button class="filter-chip active" data-tab="inbox">Reçus</button>
-          <button class="filter-chip" data-tab="sent">Envoyés</button>
-        </div>
-
         <div class="messages-layout">
           <div class="messages-list" id="msg-list">
             <div class="empty-state" style="padding:var(--space-xl)"><div class="spinner"></div></div>
           </div>
           <div class="message-detail" id="msg-detail">
-            <div class="empty-state"><div class="empty-state__icon">✉️</div><h3>Sélectionnez un message</h3></div>
+            <div class="empty-state"><div class="empty-state__icon">✉️</div><h3>Selectionnez une conversation</h3></div>
           </div>
         </div>
       </div>
@@ -1049,87 +1047,107 @@ async function renderMessages(app) {
   let inbox = [], sent = [];
   try { [inbox, sent] = await Promise.all([Messages.inbox(), Messages.sent()]); } catch {}
 
-  function renderList(messages, tab) {
-    const list = document.getElementById('msg-list');
-    if (!messages.length) {
-      list.innerHTML = `<div class="empty-state" style="padding:var(--space-xl)"><p class="font-ui text-small text-muted">Aucun message</p></div>`;
+  function buildConversations(inboxM, sentM, uid) {
+    const map = {};
+    [...inboxM, ...sentM].forEach(m => {
+      const oid = m.sender_id === uid ? m.recipient_id : m.sender_id;
+      const oname = m.sender_id === uid ? (m.recipient_name || 'Inconnu') : (m.sender_name || 'Inconnu');
+      const oorg = m.sender_id === uid ? (m.recipient_org || '') : (m.sender_org || '');
+      if (!map[oid]) map[oid] = { oid, oname, oorg, messages: [], unread: 0 };
+      map[oid].messages.push(m);
+      if (!m.read && m.recipient_id === uid) map[oid].unread++;
+    });
+    Object.values(map).forEach(c => c.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+    return Object.values(map).sort((a, b) => {
+      const al = a.messages[a.messages.length-1].created_at;
+      const bl = b.messages[b.messages.length-1].created_at;
+      return new Date(bl) - new Date(al);
+    });
+  }
+
+  let convs = buildConversations(inbox, sent, currentUser?.id);
+  let activeId = null;
+
+  function renderConvList() {
+    const list = document.getElementById("msg-list");
+    if (!convs.length) {
+      list.innerHTML = "<div class=\"empty-state\" style=\"padding:var(--space-xl)\"><p class=\"font-ui text-small text-muted\">Aucune conversation</p></div>";
       return;
     }
-    list.innerHTML = messages.map(m => `
-      <div class="message-item ${!m.read && tab==='inbox' ? 'unread' : ''}" data-id="${m.id}" onclick="openMessage('${m.id}','${tab}')">
-        <div class="message-item__subject">${escapeHtml(m.subject || '(sans objet)')}</div>
-        <div class="message-item__meta">
-          ${tab === 'inbox' ? escapeHtml(m.sender_name || '') : `→ ${escapeHtml(m.recipient_name||'')}`}
-          · ${formatDateShort(m.created_at)}
-        </div>
-      </div>
-    `).join('');
+    list.innerHTML = convs.map(c => {
+      const last = c.messages[c.messages.length-1];
+      return "<div class=\"message-item " + (c.unread > 0 ? "unread" : "") + " " + (c.oid === activeId ? "active" : "") + "\" onclick=\"openConv('" + c.oid + "')\">"
+        + "<div style=\"display:flex;justify-content:space-between\"><div class=\"message-item__subject\">" + escapeHtml(c.oorg || c.oname) + "</div>"
+        + (c.unread > 0 ? "<span style=\"background:var(--color-terracotta);color:white;border-radius:999px;font-size:11px;padding:2px 7px\">" + c.unread + "</span>" : "")
+        + "</div><div class=\"message-item__meta\">" + escapeHtml(c.oname) + " · " + formatDateShort(last.created_at) + "</div>"
+        + "<div style=\"font-size:0.82rem;color:var(--color-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis\">" + escapeHtml((last.body||"").slice(0,60)) + "…</div></div>";
+    }).join("");
   }
 
-  let currentTab = 'inbox';
-  let currentMessages = inbox;
-  renderList(inbox, 'inbox');
-
-  document.getElementById('msg-tabs').addEventListener('click', e => {
-    const chip = e.target.closest('.filter-chip');
-    if (!chip) return;
-    document.querySelectorAll('#msg-tabs .filter-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    currentTab = chip.dataset.tab;
-    currentMessages = currentTab === 'inbox' ? inbox : sent;
-    renderList(currentMessages, currentTab);
-    document.getElementById('msg-detail').innerHTML = `<div class="empty-state"><div class="empty-state__icon">✉️</div><h3>Sélectionnez un message</h3></div>`;
-  });
-
-  window.openMessage = async (id, tab) => {
-    const messages = tab === 'inbox' ? inbox : sent;
-    const msg = messages.find(m => m.id === id);
-    if (!msg) return;
-
-    // Marquer comme lu
-    if (!msg.read && tab === 'inbox') {
-      msg.read = 1;
-      try { await Messages.markRead(id); refreshUnreadBadge(); } catch {}
-      document.querySelector(`.message-item[data-id="${id}"]`)?.classList.remove('unread');
+  window.openConv = async (oid) => {
+    activeId = oid;
+    renderConvList();
+    const conv = convs.find(c => c.oid === oid);
+    if (!conv) return;
+    for (const m of conv.messages) {
+      if (!m.read && m.recipient_id === currentUser?.id) {
+        m.read = true;
+        try { await Messages.markRead(m.id); } catch {}
+      }
     }
-
-    document.querySelectorAll('.message-item').forEach(el => el.classList.remove('active'));
-    document.querySelector(`.message-item[data-id="${id}"]`)?.classList.add('active');
-
-    const detail = document.getElementById('msg-detail');
-    detail.innerHTML = `
-  <div class="message-detail__header">
-    <h4>${escapeHtml(msg.subject || '(sans objet)')}</h4>
-    <div class="text-muted text-small font-ui mt-sm">
-      ${tab === 'inbox' ? `De : <strong>${escapeHtml(msg.sender_name||'')}</strong>` : `À : <strong>${escapeHtml(msg.recipient_name||'')}</strong>`}
-      · ${formatDate(msg.created_at)}
-    </div>
-  </div>
-  <div style="line-height:1.8;font-size:0.95rem;white-space:pre-wrap;margin-bottom:var(--space-xl)">${escapeHtml(msg.body)}</div>
-  ${tab === 'inbox' && msg.sender_id ? `
-    <div style="border-top:1px solid var(--color-border);padding-top:var(--space-lg)">
-      <div class="form-group mb-md">
-        <label class="form-label">Répondre à ${escapeHtml(msg.sender_name||'')}</label>
-        <textarea class="form-textarea w-full" id="reply-body" rows="4" placeholder="Votre réponse…"></textarea>
-      </div>
-      <button class="btn btn--primary" onclick="submitReply('${msg.sender_id}','RE: ${escapeHtml(msg.subject||'')}')">Envoyer la réponse</button>
-    </div>
-  ` : ''}
-`;
+    conv.unread = 0;
+    refreshUnreadBadge();
+    renderConvList();
+    const detail = document.getElementById("msg-detail");
+    const threadHtml = conv.messages.map(m => {
+      const mine = m.sender_id === currentUser?.id;
+      return "<div style=\"display:flex;flex-direction:column;align-items:" + (mine?"flex-end":"flex-start") + "\">"
+        + "<div style=\"max-width:75%;background:" + (mine?"var(--color-forest)":"white") + ";color:" + (mine?"white":"var(--color-text)") + ";border-radius:" + (mine?"16px 16px 4px 16px":"16px 16px 16px 4px") + ";padding:10px 14px;border:1px solid " + (mine?"transparent":"var(--color-border)") + "\">"
+        + "<div style=\"font-size:0.93rem;white-space:pre-wrap\">" + escapeHtml(m.body) + "</div></div>"
+        + "<div style=\"font-size:0.75rem;color:var(--color-text-muted);margin-top:3px\">" + formatDateShort(m.created_at) + "</div></div>";
+    }).join("");
+    detail.innerHTML = "<div style=\"display:flex;flex-direction:column;height:100%\">"
+      + "<div style=\"padding:var(--space-md) var(--space-lg);border-bottom:1px solid var(--color-border)\">"
+      + "<strong>" + escapeHtml(conv.oorg || conv.oname) + "</strong>"
+      + "<span class=\"text-muted text-small font-ui\" style=\"margin-left:8px\">" + escapeHtml(conv.oname) + "</span></div>"
+      + "<div style=\"background:var(--color-sand);border:1px solid var(--color-border);border-radius:8px;margin:var(--space-md) var(--space-lg);padding:var(--space-md);font-size:0.85rem;color:var(--color-text-muted)\">"
+      + "<strong style=\"color:var(--color-forest)\">Pour bien organiser votre echange :</strong><br>"
+      + "Precisez la formation souhaitee, les dates envisagees, le nombre de participants, le lieu et toute contrainte particuliere."
+      + "</div>"
+      + "<div id=\"chat-thread\" style=\"flex:1;overflow-y:auto;padding:var(--space-md) var(--space-lg);display:flex;flex-direction:column;gap:12px\">" + threadHtml + "</div>"
+      + "<div style=\"padding:var(--space-md) var(--space-lg);border-top:1px solid var(--color-border);display:flex;gap:8px;align-items:flex-end\">"
+      + "<textarea id=\"reply-body\" class=\"form-textarea\" rows=\"2\" placeholder=\"Votre message...\" style=\"flex:1;resize:none\"></textarea>"
+      + "<button class=\"btn btn--primary\" onclick=\"sendReply('" + oid + "')\">Envoyer</button></div></div>";
+    const t = document.getElementById("chat-thread");
+    if (t) t.scrollTop = t.scrollHeight;
   };
-window.submitReply = async (recipientId, subject) => {
-  const body = document.getElementById('reply-body')?.value.trim();
-  if (!body) { Toast.error('Écrivez un message'); return; }
-  try {
-    await Messages.send({ recipient_id: recipientId, subject, body });
-    Toast.success('Réponse envoyée !');
-    document.getElementById('reply-body').value = '';
-  } catch (err) {
-    Toast.error(err.message);
-  }
-};
 
+  window.sendReply = async (rid) => {
+    const el = document.getElementById("reply-body");
+    const body = el?.value.trim();
+    if (!body) { Toast.error("Ecrivez un message"); return; }
+    try {
+      const msg = await Messages.send({ recipient_id: rid, subject: "Message TrocLab", body });
+      el.value = "";
+      const conv = convs.find(c => c.oid === rid);
+      if (conv) { conv.messages.push({...msg, sender_id: currentUser?.id, body}); openConv(rid); }
+      Toast.success("Message envoye !");
+    } catch (err) { Toast.error(err.message || "Erreur"); }
+  };
+
+  window.refreshMessages = async () => {
+    try {
+      [inbox, sent] = await Promise.all([Messages.inbox(), Messages.sent()]);
+      convs = buildConversations(inbox, sent, currentUser?.id);
+      renderConvList();
+      if (activeId) openConv(activeId);
+      Toast.success("Messages actualises");
+    } catch { Toast.error("Erreur"); }
+  };
+
+  renderConvList();
 }
+
 
 // =============================================
 // MODALS & ACTIONS GLOBALES
