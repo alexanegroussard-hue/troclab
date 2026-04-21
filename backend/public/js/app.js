@@ -284,105 +284,147 @@ async function loadHomeData() {
 }
 
 // =============================================
-// PAGE : CATALOGUE
+// PAGE : MESSAGES
 // =============================================
-async function renderCatalogue(app) {
+async function renderMessages(app) {
+  const currentUser = Session.getUser();
+
   app.innerHTML = `
     <div class="section">
       <div class="container">
-        <div class="section__header">
-          <div class="section__eyebrow">Toutes les formations</div>
-          <h2>Catalogue</h2>
-        </div>
-
-        <!-- Barre de filtres -->
-        <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;align-items:center;margin-bottom:var(--space-lg)">
-          <input type="text" class="form-input" id="search-input" placeholder="Rechercher une formation…" style="flex:1;min-width:200px;max-width:360px">
-          <div class="filters-bar" id="type-filters">
-            <button class="filter-chip active" data-type="">Toutes</button>
-            <button class="filter-chip" data-type="offered">🌱 Proposées</button>
-            <button class="filter-chip" data-type="wanted">🔍 Recherchées</button>
+        <div class="section__header flex justify-between items-center" style="flex-wrap:wrap;gap:var(--space-md)">
+          <div>
+            <div class="section__eyebrow">Messagerie</div>
+            <h2>Messages</h2>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="refreshMessages()" class="btn btn--sm">↻ Rafraîchir</button>
+            <button onclick="openMessageCompose()" class="btn btn--primary btn--sm">+ Nouveau message</button>
           </div>
         </div>
-
-        <!-- Chips catégories -->
-        <div class="filters-bar" id="category-filters" style="margin-bottom:var(--space-xl)">
-          <button class="filter-chip active" data-cat="">Toutes catégories</button>
-        </div>
-
-        <div class="grid grid--3" id="formations-grid">
-          <div class="empty-state" style="grid-column:1/-1"><div class="spinner"></div></div>
+        <div class="messages-layout">
+          <div class="messages-list" id="msg-list">
+            <div class="empty-state" style="padding:var(--space-xl)"><div class="spinner"></div></div>
+          </div>
+          <div class="message-detail" id="msg-detail">
+            <div class="empty-state"><div class="empty-state__icon">✉️</div><h3>Sélectionnez une conversation</h3></div>
+          </div>
         </div>
       </div>
     </div>
   `;
 
-  const user = Session.getUser();
-  let allFormations = [];
-  let activeType = '';
-  let activeCategory = '';
-  let searchValue = '';
+  let inbox = [], sent = [];
+  try { [inbox, sent] = await Promise.all([Messages.inbox(), Messages.sent()]); } catch {}
 
-  try { allFormations = await Formations.list(); } catch {}
-
-  // Remplir catégories
-  const cats = [...new Set(allFormations.map(f => f.category))];
-  const catFilters = document.getElementById('category-filters');
-  cats.forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'filter-chip';
-    btn.dataset.cat = c;
-    btn.textContent = c;
-    catFilters.appendChild(btn);
-  });
-
-  function filterAndRender() {
-    let list = allFormations;
-    if (activeType) list = list.filter(f => f.type === activeType);
-    if (activeCategory) list = list.filter(f => f.category === activeCategory);
-    if (searchValue) {
-      const q = searchValue.toLowerCase();
-      list = list.filter(f =>
-        f.title.toLowerCase().includes(q) ||
-        f.description.toLowerCase().includes(q) ||
-        f.category.toLowerCase().includes(q)
-      );
-    }
-    const grid = document.getElementById('formations-grid');
-    grid.innerHTML = list.length
-      ? list.map(f => formationCardHTML(f, false, user?.id)).join('')
-      : `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state__icon">🔍</div><h3>Aucune formation trouvée</h3><p>Modifiez les filtres ou <a href="/inscription" style="color:var(--color-forest)">proposez la vôtre</a>.</p></div>`;
+  function buildConversations(inbox, sent, currentUserId) {
+    const convMap = {};
+    [...inbox, ...sent].forEach(m => {
+      const otherId = m.sender_id === currentUserId ? m.recipient_id : m.sender_id;
+      const otherName = m.sender_id === currentUserId ? (m.recipient_name || 'Inconnu') : (m.sender_name || 'Inconnu');
+      const otherOrg = m.sender_id === currentUserId ? (m.recipient_org || '') : (m.sender_org || '');
+      if (!convMap[otherId]) convMap[otherId] = { otherId, otherName, otherOrg, messages: [], unread: 0 };
+      convMap[otherId].messages.push(m);
+      if (!m.read && m.recipient_id === currentUserId) convMap[otherId].unread++;
+    });
+    Object.values(convMap).forEach(c => c.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+    return Object.values(convMap).sort((a, b) => {
+      const aLast = a.messages[a.messages.length - 1].created_at;
+      const bLast = b.messages[b.messages.length - 1].created_at;
+      return new Date(bLast) - new Date(aLast);
+    });
   }
 
-  filterAndRender();
+  let conversations = buildConversations(inbox, sent, currentUser?.id);
+  let activeConvId = null;
 
-  // Filtres type
-  document.getElementById('type-filters').addEventListener('click', e => {
-    const chip = e.target.closest('.filter-chip');
-    if (!chip) return;
-    document.querySelectorAll('#type-filters .filter-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    activeType = chip.dataset.type;
-    filterAndRender();
-  });
+  function renderConvList() {
+    const list = document.getElementById('msg-list');
+    if (!conversations.length) {
+      list.innerHTML = '<div class="empty-state" style="padding:var(--space-xl)"><p class="font-ui text-small text-muted">Aucune conversation</p></div>';
+      return;
+    }
+    list.innerHTML = conversations.map(c => {
+      const last = c.messages[c.messages.length - 1];
+      const isActive = c.otherId === activeConvId;
+      return '<div class="message-item ' + (c.unread > 0 ? 'unread' : '') + ' ' + (isActive ? 'active' : '') + '" onclick="openConversation(\'' + c.otherId + '\')">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center">'
+        + '<div class="message-item__subject">' + escapeHtml(c.otherOrg || c.otherName) + '</div>'
+        + (c.unread > 0 ? '<span style="background:var(--color-terracotta);color:white;border-radius:999px;font-size:11px;padding:2px 7px;font-weight:600">' + c.unread + '</span>' : '')
+        + '</div>'
+        + '<div class="message-item__meta">' + escapeHtml(c.otherName) + ' · ' + formatDateShort(last.created_at) + '</div>'
+        + '<div style="font-size:0.82rem;color:var(--color-text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escapeHtml((last.body || '').slice(0,60)) + '…</div>'
+        + '</div>';
+    }).join('');
+  }
 
-  // Filtres catégorie
-  catFilters.addEventListener('click', e => {
-    const chip = e.target.closest('.filter-chip');
-    if (!chip) return;
-    document.querySelectorAll('#category-filters .filter-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    activeCategory = chip.dataset.cat;
-    filterAndRender();
-  });
+  window.openConversation = async (otherId) => {
+    activeConvId = otherId;
+    renderConvList();
+    const conv = conversations.find(c => c.otherId === otherId);
+    if (!conv) return;
+    for (const m of conv.messages) {
+      if (!m.read && m.recipient_id === currentUser?.id) {
+        m.read = true;
+        try { await Messages.markRead(m.id); } catch {}
+      }
+    }
+    conv.unread = 0;
+    refreshUnreadBadge();
+    renderConvList();
+    const detail = document.getElementById('msg-detail');
+    const thread = conv.messages.map(m => {
+      const isMine = m.sender_id === currentUser?.id;
+      return '<div style="display:flex;flex-direction:column;align-items:' + (isMine ? 'flex-end' : 'flex-start') + '">'
+        + '<div style="max-width:75%;background:' + (isMine ? 'var(--color-forest)' : 'white') + ';color:' + (isMine ? 'white' : 'var(--color-text)') + ';border-radius:' + (isMine ? '16px 16px 4px 16px' : '16px 16px 16px 4px') + ';padding:10px 14px;border:1px solid ' + (isMine ? 'transparent' : 'var(--color-border)') + '">'
+        + '<div style="font-size:0.93rem;white-space:pre-wrap">' + escapeHtml(m.body) + '</div>'
+        + '</div>'
+        + '<div style="font-size:0.75rem;color:var(--color-text-muted);margin-top:3px">' + formatDateShort(m.created_at) + '</div>'
+        + '</div>';
+    }).join('');
+    detail.innerHTML = '<div style="display:flex;flex-direction:column;height:100%">'
+      + '<div style="padding:var(--space-md) var(--space-lg);border-bottom:1px solid var(--color-border)">'
+      + '<strong>' + escapeHtml(conv.otherOrg || conv.otherName) + '</strong>'
+      + '<span class="text-muted text-small font-ui" style="margin-left:8px">' + escapeHtml(conv.otherName) + '</span>'
+      + '</div>'
+      + '<div style="background:var(--color-sand);border:1px solid var(--color-border);border-radius:8px;margin:var(--space-md) var(--space-lg);padding:var(--space-md);font-size:0.85rem;color:var(--color-text-muted)">'
+      + '<strong style="color:var(--color-forest)">💡 Pour bien organiser votre échange :</strong><br>'
+      + 'Précisez la <strong>formation souhaitée</strong>, les <strong>dates envisagées</strong>, le <strong>nombre de participants</strong>, le <strong>lieu</strong> et toute contrainte particulière.'
+      + '</div>'
+      + '<div id="chat-thread" style="flex:1;overflow-y:auto;padding:var(--space-md) var(--space-lg);display:flex;flex-direction:column;gap:12px">' + thread + '</div>'
+      + '<div style="padding:var(--space-md) var(--space-lg);border-top:1px solid var(--color-border);display:flex;gap:8px;align-items:flex-end">'
+      + '<textarea id="reply-body" class="form-textarea" rows="2" placeholder="Votre message…" style="flex:1;resize:none" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();sendReply(\'' + "'+otherId+'" + '\')}"></textarea>'
+      + '<button class="btn btn--primary" onclick="sendReply(\'' + "'+otherId+'" + '\')">Envoyer</button>'
+      + '</div></div>';
+    const t = document.getElementById('chat-thread');
+    if (t) t.scrollTop = t.scrollHeight;
+  };
 
-  // Recherche
-  document.getElementById('search-input').addEventListener('input', e => {
-    searchValue = e.target.value;
-    filterAndRender();
-  });
+  window.sendReply = async (recipientId) => {
+    const bodyEl = document.getElementById('reply-body');
+    const body = bodyEl?.value.trim();
+    if (!body) { Toast.error('Écrivez un message'); return; }
+    try {
+      const msg = await Messages.send({ recipient_id: recipientId, subject: 'Message TrocLab', body });
+      bodyEl.value = '';
+      const conv = conversations.find(c => c.otherId === recipientId);
+      if (conv) { conv.messages.push({ ...msg, sender_id: currentUser?.id, body }); openConversation(recipientId); }
+      Toast.success('Message envoyé !');
+    } catch (err) { Toast.error(err.message || 'Erreur envoi'); }
+  };
+
+  window.refreshMessages = async () => {
+    try {
+      [inbox, sent] = await Promise.all([Messages.inbox(), Messages.sent()]);
+      conversations = buildConversations(inbox, sent, currentUser?.id);
+      renderConvList();
+      if (activeConvId) openConversation(activeConvId);
+      Toast.success('Messages actualisés');
+    } catch { Toast.error('Erreur de rafraîchissement'); }
+  };
+
+  renderConvList();
 }
-
 // =============================================
 // PAGE : CARTE
 // =============================================
