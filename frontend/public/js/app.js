@@ -15,6 +15,7 @@ const routes = {
   '/inscription':       renderRegister,
   '/tableau-de-bord':   renderDashboard,
   '/messages':          renderMessages,
+  '/alertes':           renderAlertes,   // ← ici
   '/profil/:id':        renderProfil,
 };
 
@@ -84,10 +85,12 @@ function renderNav() {
   const footerLogin = document.getElementById('footer-login-link');
   const footerDash = document.getElementById('footer-dash-link');
 
-  if (user) {
+
+if (user) {
     nav.innerHTML = `
       <a href="/catalogue" class="nav-link">Formations</a>
       <a href="/carte" class="nav-link">Carte</a>
+      <a href="/alertes" class="nav-link">Alertes</a>
       <a href="/messages" class="nav-link">
         Messages <span class="navbar__badge hidden" id="msg-badge">0</span>
       </a>
@@ -112,148 +115,139 @@ function renderNav() {
 }
 
 // =============================================
-// PAGE : ACCUEIL
+// PAGE : ALERTES
 // =============================================
-async function renderHome(app) {
-  const user = Session.getUser();
+async function renderAlertes(app) {
   app.innerHTML = `
-    <!-- HERO -->
-    <section class="hero">
+    <div class="section">
       <div class="container">
-        <div class="hero__content">
-          <div class="hero__eyebrow">Plateforme de réciprocité</div>
-          <h1>Échangez des formations,<br><em>sans argent</em></h1>
-          <p class="hero__sub">
-            TrocLab connecte les fablabs, associations, coopératives et tiers-lieux pour
-            partager leurs savoir-faire. Vous formez, vous vous formez — en équilibre.
-          </p>
-          <div class="hero__cta">
-            ${user
-              ? `<a href="/catalogue" class="btn btn--primary btn--lg">Voir le catalogue</a>
-                 <a href="/tableau-de-bord" class="btn btn--secondary btn--lg" style="border-color:rgba(255,255,255,0.5);color:white">Mon espace</a>`
-              : `<a href="/inscription" class="btn btn--primary btn--lg">Rejoindre gratuitement</a>
-                 <a href="/catalogue" class="btn btn--secondary btn--lg" style="border-color:rgba(255,255,255,0.5);color:white">Voir les formations</a>`
-            }
-          </div>
-          <div class="hero__stats" id="hero-stats">
-            <div><div class="stat__value">…</div><div class="stat__label">Structures membres</div></div>
-            <div><div class="stat__value">…</div><div class="stat__label">Formations proposées</div></div>
-            <div><div class="stat__value">…</div><div class="stat__label">Échanges réalisés</div></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- COMMENT ÇA MARCHE -->
-    <section class="section">
-      <div class="container">
-        <div class="section__header">
-          <div class="section__eyebrow">Fonctionnement</div>
-          <h2>Simple, équitable, transparent</h2>
-        </div>
-        <div class="how-it-works">
-          <div class="step">
-            <div class="step__icon">📝</div>
-            <h4>Créez votre profil</h4>
-            <p>Décrivez votre structure, les formations que vous proposez et celles que vous cherchez.</p>
-          </div>
-          <div class="step">
-            <div class="step__icon">🔍</div>
-            <h4>Explorez le catalogue</h4>
-            <p>Parcourez les formations disponibles près de chez vous ou à distance.</p>
-          </div>
-          <div class="step">
-            <div class="step__icon">🤝</div>
-            <h4>Proposez un échange</h4>
-            <p>Contactez une structure, organisez l'échange via la messagerie intégrée.</p>
-          </div>
-          <div class="step">
-            <div class="step__icon">⚖️</div>
-            <h4>Restez en équilibre</h4>
-            <p>La plateforme veille à ce que chacun donne autant qu'il reçoit (±5 formations).</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SYSTÈME D'ÉQUILIBRE -->
-    <section class="section section--alt">
-      <div class="container">
-        <div class="balance-explainer">
+        <div class="section__header flex justify-between items-center" style="flex-wrap:wrap;gap:var(--space-md)">
           <div>
-            <div class="section__eyebrow" style="color:var(--color-moss)">Le cœur du système</div>
-            <h2 style="color:white">L'équilibre voyageur / hôte</h2>
-            <p style="color:rgba(245,240,232,0.8);margin-top:var(--space-md);line-height:1.7">
-              Chaque membre peut être <strong>voyageur</strong> (se faire former ailleurs) et <strong>hôte</strong>
-              (former des bénévoles d'autres structures). La différence entre les deux ne peut pas dépasser
-              <strong>5 formations</strong>, pour garantir la réciprocité.
-            </p>
-            <p style="color:rgba(245,240,232,0.6);margin-top:var(--space-md);font-size:0.9rem;font-family:var(--font-ui)">
-              Ce n'est pas une transaction : c'est une logique du don et du contre-don, adaptée aux réalités associatives.
+            <div class="section__eyebrow">Mon espace</div>
+            <h2>Mes alertes</h2>
+            <p class="text-muted font-ui" style="margin-top:8px">
+              Configurez des alertes pour être notifié des formations qui vous intéressent.
             </p>
           </div>
-          <div class="balance-visual">
-            <div class="balance-row">
-              <span class="balance-pill pill--green">Voyageur ×3</span>
-              <span style="color:rgba(245,240,232,0.6)">formations reçues</span>
-            </div>
-            <div class="balance-row">
-              <span class="balance-pill pill--green">Hôte ×2</span>
-              <span style="color:rgba(245,240,232,0.6)">formations données</span>
-            </div>
-            <div style="color:var(--color-moss);font-family:var(--font-ui);font-size:0.9rem;padding:8px 0">
-              ✓ Différence = 1 — Équilibré
-            </div>
-            <div class="balance-row" style="margin-top:var(--space-md);padding-top:var(--space-md);border-top:1px solid rgba(255,255,255,0.15)">
-              <span class="balance-pill pill--orange">Voyageur ×8</span>
-              <span style="color:rgba(245,240,232,0.6)">formations reçues</span>
-            </div>
-            <div class="balance-row">
-              <span class="balance-pill pill--green">Hôte ×2</span>
-              <span style="color:rgba(245,240,232,0.6)">formations données</span>
-            </div>
-            <div style="color:var(--color-terracotta);font-family:var(--font-ui);font-size:0.9rem;padding:8px 0">
-              ✕ Différence = 6 — Blocage temporaire
-            </div>
-          </div>
         </div>
-      </div>
-    </section>
 
-    <!-- FORMATIONS EN VEDETTE -->
-    <section class="featured-section">
-      <div class="container">
-        <div class="section__header flex justify-between items-center">
-          <div>
-            <div class="section__eyebrow">Catalogue</div>
-            <h2>Formations récentes</h2>
+        <!-- Formulaire nouvelle alerte -->
+        <div class="card" style="max-width:520px;margin-bottom:var(--space-xl)">
+          <h4 style="margin-bottom:var(--space-md)">Nouvelle alerte</h4>
+          <div id="alert-error"></div>
+          <div class="form-group mb-md">
+            <label class="form-label">Catégorie</label>
+            <input class="form-input w-full" id="alert-category" placeholder="ex: Fabrication numérique, Communication…">
           </div>
-          <a href="/catalogue" class="btn btn--secondary">Voir tout →</a>
+          <div class="form-group mb-lg">
+            <label class="form-label">Mot-clé</label>
+            <input class="form-input w-full" id="alert-keyword" placeholder="ex: sérigraphie, Arduino, comptabilité…">
+          </div>
+          <p class="form-hint mb-lg">Remplissez l'un ou l'autre, ou les deux.</p>
+          <button class="btn btn--primary" onclick="submitAlert()">+ Ajouter l'alerte</button>
         </div>
-        <div class="grid grid--3" id="featured-formations">
-          ${[1,2,3].map(() => `<div class="card" style="height:180px;background:var(--color-sand);animation:none"></div>`).join('')}
-        </div>
-      </div>
-    </section>
 
-    <!-- CTA FINAL -->
-    ${!user ? `
-    <section class="section" style="background:var(--color-forest);color:white;text-align:center">
-      <div class="container--narrow">
-        <h2 style="color:white">Prêt à rejoindre la communauté ?</h2>
-        <p style="color:rgba(245,240,232,0.8);margin:var(--space-lg) 0;font-size:1.05rem">
-          Inscription gratuite. 2 formations sans abonnement pour tester la plateforme.
-        </p>
-        <a href="/inscription" class="btn btn--primary btn--lg" style="background:white;color:var(--color-forest);border-color:white">
-          Créer mon compte gratuitement
-        </a>
+        <!-- Mes alertes configurées -->
+        <h3 style="margin-bottom:var(--space-md)">Alertes configurées</h3>
+        <div id="alerts-list" style="margin-bottom:var(--space-xl)">
+          <div class="empty-state"><div class="spinner"></div></div>
+        </div>
+
+        <!-- Formations correspondantes -->
+        <h3 style="margin-bottom:var(--space-md)">Formations correspondantes</h3>
+        <div id="alerts-matches" class="grid grid--3">
+          <div class="empty-state" style="grid-column:1/-1"><div class="spinner"></div></div>
+        </div>
       </div>
-    </section>
-    ` : ''}
+    </div>
   `;
 
-  // Charger stats et formations en arrière-plan
-  loadHomeData();
+  loadAlertes();
+}
+
+async function loadAlertes() {
+  try {
+    const [alerts, matches] = await Promise.all([
+      fetch('/api/alerts', { headers: { Authorization: `Bearer ${localStorage.getItem('troclab_token')}` } }).then(r => r.json()),
+      fetch('/api/alerts/matches', { headers: { Authorization: `Bearer ${localStorage.getItem('troclab_token')}` } }).then(r => r.json()),
+    ]);
+
+    // Afficher les alertes configurées
+    const alertsList = document.getElementById('alerts-list');
+    alertsList.innerHTML = alerts.length
+      ? alerts.map(a => `
+          <div class="card mb-md flex items-center justify-between" style="flex-wrap:wrap;gap:var(--space-md)">
+            <div class="flex gap-md" style="flex-wrap:wrap">
+              ${a.category ? `<span class="category-tag">📂 ${escapeHtml(a.category)}</span>` : ''}
+              ${a.keyword ? `<span class="category-tag">🔑 ${escapeHtml(a.keyword)}</span>` : ''}
+            </div>
+            <button onclick="deleteAlert('${a.id}')" class="btn btn--danger btn--sm">Supprimer</button>
+          </div>
+        `).join('')
+      : `<div class="empty-state card">
+           <div class="empty-state__icon">🔔</div>
+           <h3>Aucune alerte</h3>
+           <p>Ajoutez une alerte pour suivre les formations qui vous intéressent.</p>
+         </div>`;
+
+    // Afficher les formations correspondantes
+    const matchesEl = document.getElementById('alerts-matches');
+    const user = Session.getUser();
+    matchesEl.innerHTML = matches.length
+      ? matches.map(f => formationCardHTML(f, false, user?.id)).join('')
+      : `<div class="empty-state" style="grid-column:1/-1">
+           <div class="empty-state__icon">🌱</div>
+           <h3>Aucune formation correspondante</h3>
+           <p>Aucune formation ne correspond à vos alertes pour l'instant.</p>
+         </div>`;
+
+  } catch (err) {
+    Toast.error('Erreur lors du chargement des alertes');
+  }
+}
+
+async function submitAlert() {
+  const category = document.getElementById('alert-category')?.value.trim();
+  const keyword = document.getElementById('alert-keyword')?.value.trim();
+  const errEl = document.getElementById('alert-error');
+
+  if (!category && !keyword) {
+    errEl.innerHTML = `<div class="alert alert--error mb-md">Remplissez au moins un champ.</div>`;
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/alerts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('troclab_token')}`
+      },
+      body: JSON.stringify({ category, keyword })
+    });
+    if (!res.ok) throw await res.json();
+
+    document.getElementById('alert-category').value = '';
+    document.getElementById('alert-keyword').value = '';
+    errEl.innerHTML = '';
+    Toast.success('Alerte ajoutée !');
+    loadAlertes();
+  } catch (err) {
+    errEl.innerHTML = `<div class="alert alert--error mb-md">${err.error || 'Erreur'}</div>`;
+  }
+}
+
+async function deleteAlert(id) {
+  try {
+    await fetch(`/api/alerts/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${localStorage.getItem('troclab_token')}` }
+    });
+    Toast.success('Alerte supprimée');
+    loadAlertes();
+  } catch {
+    Toast.error('Erreur lors de la suppression');
+  }
 }
 
 async function loadHomeData() {
@@ -1395,3 +1389,46 @@ document.addEventListener('DOMContentLoaded', () => {
   renderNav();
   renderPage(window.location.pathname);
 });
+
+// =============================================
+// PAGE : ACCUEIL
+// =============================================
+async function renderHome(app) {
+  const user = Session.getUser();
+  app.innerHTML = `
+    <section class="hero">
+      <div class="container">
+        <div class="hero__content">
+          <div class="hero__eyebrow">Plateforme de réciprocité</div>
+          <h1>Échangez des formations,<br><em>sans argent</em></h1>
+          <p class="hero__sub">TrocLab connecte les fablabs, associations, coopératives et tiers-lieux pour partager leurs savoir-faire. Vous formez, vous vous formez — en équilibre.</p>
+          <div class="hero__cta">
+            ${user
+              ? `<a href="/catalogue" class="btn btn--primary btn--lg">Voir le catalogue</a>
+                 <a href="/tableau-de-bord" class="btn btn--secondary btn--lg" style="border-color:rgba(255,255,255,0.5);color:white">Mon espace</a>`
+              : `<a href="/inscription" class="btn btn--primary btn--lg">Rejoindre gratuitement</a>
+                 <a href="/catalogue" class="btn btn--secondary btn--lg" style="border-color:rgba(255,255,255,0.5);color:white">Voir les formations</a>`
+            }
+          </div>
+          <div class="hero__stats" id="hero-stats">
+            <div><div class="stat__value">…</div><div class="stat__label">Structures membres</div></div>
+            <div><div class="stat__value">…</div><div class="stat__label">Formations proposées</div></div>
+            <div><div class="stat__value">…</div><div class="stat__label">Formations référencées</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="featured-section">
+      <div class="container">
+        <div class="section__header flex justify-between items-center">
+          <div><div class="section__eyebrow">Catalogue</div><h2>Formations récentes</h2></div>
+          <a href="/catalogue" class="btn btn--secondary">Voir tout →</a>
+        </div>
+        <div class="grid grid--3" id="featured-formations">
+          ${[1,2,3].map(() => `<div class="card" style="height:180px;background:var(--color-sand)"></div>`).join('')}
+        </div>
+      </div>
+    </section>
+  `;
+  loadHomeData();
+}
