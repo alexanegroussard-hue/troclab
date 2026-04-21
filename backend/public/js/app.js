@@ -427,17 +427,14 @@ async function renderCarte(app) {
     const offered = userFormations.filter(f => f.type === 'offered');
     const wanted = userFormations.filter(f => f.type === 'wanted');
 
-    const offeredHtml = offered.length > 0 ? '<p style="margin-top:8px"><strong>🌱 Propose :</strong><br>' + offered.map(f => '• ' + f.title).join('<br>') + '</p>' : '';
-    const wantedHtml = wanted.length > 0 ? '<p style="margin-top:8px"><strong>🔍 Recherche :</strong><br>' + wanted.map(f => '• ' + f.title).join('<br>') + '</p>' : '';
-
     const popup = `
       <div class="map-popup" style="min-width:220px;padding:4px">
         <h4>${escapeHtml(u.organisation)}</h4>
         <span class="org-type">${orgTypeLabel(u.organisation_type)}</span>
         <p>📍 ${escapeHtml(u.city)}</p>
         <p>🕐 ${moisLabel}</p>
-        ${offeredHtml}
-        ${wantedHtml}
+        ${offered.length > 0 ? `<p style="margin-top:8px"><strong>🌱 Propose :</strong><br>${offered.map(f => `• ${escapeHtml(f.title)}`).join('<br>')}</p>` : ''}
+        ${wanted.length > 0 ? `<p style="margin-top:8px"><strong>🔍 Recherche :</strong><br>${wanted.map(f => `• ${escapeHtml(f.title)}`).join('<br>')}</p>` : ''}
         <a href="/profil/${u.id}" onclick="navigate('/profil/${u.id}');return false" style="color:var(--color-forest);font-family:var(--font-ui);font-size:0.82rem;font-weight:600;margin-top:8px;display:inline-block">Voir le profil →</a>
       </div>
     `;
@@ -524,7 +521,7 @@ function renderAbout(app) {
         <p class="text-muted font-ui text-small">
           TrocLab est une association loi 1901. Siège social : [Adresse à compléter]. SIRET : [à compléter].
           Hébergement : [à compléter]. Directeur de publication : [à compléter].
-          Contact : <a href="mailto:contact@troclab.fr" style="color:var(--color-forest)">contact@troclab.fr</a>
+          Contact : <a href="mailto:alexane.groussard@gmail.com" style="color:var(--color-forest)">alexane.groussard@gmail.com</a>
         </p>
 
         <div class="divider"></div>
@@ -532,7 +529,7 @@ function renderAbout(app) {
         <div class="alert alert--info">
           <strong>Une question, une idée ?</strong> TrocLab est une plateforme communautaire.
           Vos retours comptent vraiment. Écrivez-nous à
-          <a href="mailto:contact@troclab.fr" style="color:var(--color-sky)">contact@troclab.fr</a>
+          <a href="mailto:alexane.groussard@gmail.com" style="color:var(--color-sky)">alexane.groussard@gmail.com</a>
         </div>
 
       </div>
@@ -1017,8 +1014,12 @@ async function renderProfil(app, params) {
 // =============================================
 // PAGE : MESSAGES
 // =============================================
+// =============================================
+// PAGE : MESSAGES
+// =============================================
 async function renderMessages(app) {
   const currentUser = Session.getUser();
+
   app.innerHTML = `
     <div class="section">
       <div class="container">
@@ -1028,7 +1029,7 @@ async function renderMessages(app) {
             <h2>Messages</h2>
           </div>
           <div style="display:flex;gap:8px">
-            <button onclick="refreshMessages()" class="btn btn--sm">↻ Rafraichir</button>
+            <button onclick="refreshMessages()" class="btn btn--sm">↻ Rafraîchir</button>
             <button onclick="openMessageCompose()" class="btn btn--primary btn--sm">+ Nouveau message</button>
           </div>
         </div>
@@ -1037,7 +1038,7 @@ async function renderMessages(app) {
             <div class="empty-state" style="padding:var(--space-xl)"><div class="spinner"></div></div>
           </div>
           <div class="message-detail" id="msg-detail">
-            <div class="empty-state"><div class="empty-state__icon">✉️</div><h3>Selectionnez une conversation</h3></div>
+            <div class="empty-state"><div class="empty-state__icon">✉️</div><h3>Sélectionnez une conversation</h3></div>
           </div>
         </div>
       </div>
@@ -1047,47 +1048,51 @@ async function renderMessages(app) {
   let inbox = [], sent = [];
   try { [inbox, sent] = await Promise.all([Messages.inbox(), Messages.sent()]); } catch {}
 
-  function buildConversations(inboxM, sentM, uid) {
-    const map = {};
-    [...inboxM, ...sentM].forEach(m => {
-      const oid = m.sender_id === uid ? m.recipient_id : m.sender_id;
-      const oname = m.sender_id === uid ? (m.recipient_name || 'Inconnu') : (m.sender_name || 'Inconnu');
-      const oorg = m.sender_id === uid ? (m.recipient_org || '') : (m.sender_org || '');
-      if (!map[oid]) map[oid] = { oid, oname, oorg, messages: [], unread: 0 };
-      map[oid].messages.push(m);
-      if (!m.read && m.recipient_id === uid) map[oid].unread++;
+  function buildConversations(inbox, sent, currentUserId) {
+    const convMap = {};
+    [...inbox, ...sent].forEach(m => {
+      const otherId = m.sender_id === currentUserId ? m.recipient_id : m.sender_id;
+      const otherName = m.sender_id === currentUserId ? (m.recipient_name || 'Inconnu') : (m.sender_name || 'Inconnu');
+      const otherOrg = m.sender_id === currentUserId ? (m.recipient_org || '') : (m.sender_org || '');
+      if (!convMap[otherId]) convMap[otherId] = { otherId, otherName, otherOrg, messages: [], unread: 0 };
+      convMap[otherId].messages.push(m);
+      if (!m.read && m.recipient_id === currentUserId) convMap[otherId].unread++;
     });
-    Object.values(map).forEach(c => c.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
-    return Object.values(map).sort((a, b) => {
-      const al = a.messages[a.messages.length-1].created_at;
-      const bl = b.messages[b.messages.length-1].created_at;
-      return new Date(bl) - new Date(al);
+    Object.values(convMap).forEach(c => c.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+    return Object.values(convMap).sort((a, b) => {
+      const aLast = a.messages[a.messages.length - 1].created_at;
+      const bLast = b.messages[b.messages.length - 1].created_at;
+      return new Date(bLast) - new Date(aLast);
     });
   }
 
-  let convs = buildConversations(inbox, sent, currentUser?.id);
-  let activeId = null;
+  let conversations = buildConversations(inbox, sent, currentUser?.id);
+  let activeConvId = null;
 
   function renderConvList() {
-    const list = document.getElementById("msg-list");
-    if (!convs.length) {
-      list.innerHTML = "<div class=\"empty-state\" style=\"padding:var(--space-xl)\"><p class=\"font-ui text-small text-muted\">Aucune conversation</p></div>";
+    const list = document.getElementById('msg-list');
+    if (!conversations.length) {
+      list.innerHTML = '<div class="empty-state" style="padding:var(--space-xl)"><p class="font-ui text-small text-muted">Aucune conversation</p></div>';
       return;
     }
-    list.innerHTML = convs.map(c => {
-      const last = c.messages[c.messages.length-1];
-      return "<div class=\"message-item " + (c.unread > 0 ? "unread" : "") + " " + (c.oid === activeId ? "active" : "") + "\" onclick=\"openConv('" + c.oid + "')\">"
-        + "<div style=\"display:flex;justify-content:space-between\"><div class=\"message-item__subject\">" + escapeHtml(c.oorg || c.oname) + "</div>"
-        + (c.unread > 0 ? "<span style=\"background:var(--color-terracotta);color:white;border-radius:999px;font-size:11px;padding:2px 7px\">" + c.unread + "</span>" : "")
-        + "</div><div class=\"message-item__meta\">" + escapeHtml(c.oname) + " · " + formatDateShort(last.created_at) + "</div>"
-        + "<div style=\"font-size:0.82rem;color:var(--color-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis\">" + escapeHtml((last.body||"").slice(0,60)) + "…</div></div>";
-    }).join("");
+    list.innerHTML = conversations.map(c => {
+      const last = c.messages[c.messages.length - 1];
+      const isActive = c.otherId === activeConvId;
+      return '<div class="message-item ' + (c.unread > 0 ? 'unread' : '') + ' ' + (isActive ? 'active' : '') + '" onclick="openConversation(\'' + c.otherId + '\')">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center">'
+        + '<div class="message-item__subject">' + escapeHtml(c.otherOrg || c.otherName) + '</div>'
+        + (c.unread > 0 ? '<span style="background:var(--color-terracotta);color:white;border-radius:999px;font-size:11px;padding:2px 7px;font-weight:600">' + c.unread + '</span>' : '')
+        + '</div>'
+        + '<div class="message-item__meta">' + escapeHtml(c.otherName) + ' · ' + formatDateShort(last.created_at) + '</div>'
+        + '<div style="font-size:0.82rem;color:var(--color-text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escapeHtml((last.body || '').slice(0,60)) + '…</div>'
+        + '</div>';
+    }).join('');
   }
 
-  window.openConv = async (oid) => {
-    activeId = oid;
+  window.openConversation = async (otherId) => {
+    activeConvId = otherId;
     renderConvList();
-    const conv = convs.find(c => c.oid === oid);
+    const conv = conversations.find(c => c.otherId === otherId);
     if (!conv) return;
     for (const m of conv.messages) {
       if (!m.read && m.recipient_id === currentUser?.id) {
@@ -1098,57 +1103,59 @@ async function renderMessages(app) {
     conv.unread = 0;
     refreshUnreadBadge();
     renderConvList();
-    const detail = document.getElementById("msg-detail");
-    const threadHtml = conv.messages.map(m => {
-      const mine = m.sender_id === currentUser?.id;
-      return "<div style=\"display:flex;flex-direction:column;align-items:" + (mine?"flex-end":"flex-start") + "\">"
-        + "<div style=\"max-width:75%;background:" + (mine?"var(--color-forest)":"white") + ";color:" + (mine?"white":"var(--color-text)") + ";border-radius:" + (mine?"16px 16px 4px 16px":"16px 16px 16px 4px") + ";padding:10px 14px;border:1px solid " + (mine?"transparent":"var(--color-border)") + "\">"
-        + "<div style=\"font-size:0.93rem;white-space:pre-wrap\">" + escapeHtml(m.body) + "</div></div>"
-        + "<div style=\"font-size:0.75rem;color:var(--color-text-muted);margin-top:3px\">" + formatDateShort(m.created_at) + "</div></div>";
-    }).join("");
-    detail.innerHTML = "<div style=\"display:flex;flex-direction:column;height:100%\">"
-      + "<div style=\"padding:var(--space-md) var(--space-lg);border-bottom:1px solid var(--color-border)\">"
-      + "<strong>" + escapeHtml(conv.oorg || conv.oname) + "</strong>"
-      + "<span class=\"text-muted text-small font-ui\" style=\"margin-left:8px\">" + escapeHtml(conv.oname) + "</span></div>"
-      + "<div style=\"background:var(--color-sand);border:1px solid var(--color-border);border-radius:8px;margin:var(--space-md) var(--space-lg);padding:var(--space-md);font-size:0.85rem;color:var(--color-text-muted)\">"
-      + "<strong style=\"color:var(--color-forest)\">Pour bien organiser votre echange :</strong><br>"
-      + "Precisez la formation souhaitee, les dates envisagees, le nombre de participants, le lieu et toute contrainte particuliere."
-      + "</div>"
-      + "<div id=\"chat-thread\" style=\"flex:1;overflow-y:auto;padding:var(--space-md) var(--space-lg);display:flex;flex-direction:column;gap:12px\">" + threadHtml + "</div>"
-      + "<div style=\"padding:var(--space-md) var(--space-lg);border-top:1px solid var(--color-border);display:flex;gap:8px;align-items:flex-end\">"
-      + "<textarea id=\"reply-body\" class=\"form-textarea\" rows=\"2\" placeholder=\"Votre message...\" style=\"flex:1;resize:none\"></textarea>"
-      + "<button class=\"btn btn--primary\" onclick=\"sendReply('" + oid + "')\">Envoyer</button></div></div>";
-    const t = document.getElementById("chat-thread");
+    const detail = document.getElementById('msg-detail');
+    const thread = conv.messages.map(m => {
+      const isMine = m.sender_id === currentUser?.id;
+      return '<div style="display:flex;flex-direction:column;align-items:' + (isMine ? 'flex-end' : 'flex-start') + '">'
+        + '<div style="max-width:75%;background:' + (isMine ? 'var(--color-forest)' : 'white') + ';color:' + (isMine ? 'white' : 'var(--color-text)') + ';border-radius:' + (isMine ? '16px 16px 4px 16px' : '16px 16px 16px 4px') + ';padding:10px 14px;border:1px solid ' + (isMine ? 'transparent' : 'var(--color-border)') + '">'
+        + '<div style="font-size:0.93rem;white-space:pre-wrap">' + escapeHtml(m.body) + '</div>'
+        + '</div>'
+        + '<div style="font-size:0.75rem;color:var(--color-text-muted);margin-top:3px">' + formatDateShort(m.created_at) + '</div>'
+        + '</div>';
+    }).join('');
+    detail.innerHTML = '<div style="display:flex;flex-direction:column;height:100%">'
+      + '<div style="padding:var(--space-md) var(--space-lg);border-bottom:1px solid var(--color-border)">'
+      + '<strong>' + escapeHtml(conv.otherOrg || conv.otherName) + '</strong>'
+      + '<span class="text-muted text-small font-ui" style="margin-left:8px">' + escapeHtml(conv.otherName) + '</span>'
+      + '</div>'
+      + '<div style="background:var(--color-sand);border:1px solid var(--color-border);border-radius:8px;margin:var(--space-md) var(--space-lg);padding:var(--space-md);font-size:0.85rem;color:var(--color-text-muted)">'
+      + '<strong style="color:var(--color-forest)">💡 Pour bien organiser votre échange :</strong><br>'
+      + 'Précisez la <strong>formation souhaitée</strong>, les <strong>dates envisagées</strong>, le <strong>nombre de participants</strong>, le <strong>lieu</strong> et toute contrainte particulière.'
+      + '</div>'
+      + '<div id="chat-thread" style="flex:1;overflow-y:auto;padding:var(--space-md) var(--space-lg);display:flex;flex-direction:column;gap:12px">' + thread + '</div>'
+      + '<div style="padding:var(--space-md) var(--space-lg);border-top:1px solid var(--color-border);display:flex;gap:8px;align-items:flex-end">'
+      + '<textarea id="reply-body" class="form-textarea" rows="2" placeholder="Votre message…" style="flex:1;resize:none" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();sendReply(\'' + otherId + '\')}"></textarea>'
+      + '<button class="btn btn--primary" onclick="sendReply(\'' + otherId + '\')">Envoyer</button>'
+      + '</div></div>';
+    const t = document.getElementById('chat-thread');
     if (t) t.scrollTop = t.scrollHeight;
   };
 
-  window.sendReply = async (rid) => {
-    const el = document.getElementById("reply-body");
-    const body = el?.value.trim();
-    if (!body) { Toast.error("Ecrivez un message"); return; }
+  window.sendReply = async (recipientId) => {
+    const bodyEl = document.getElementById('reply-body');
+    const body = bodyEl?.value.trim();
+    if (!body) { Toast.error('Écrivez un message'); return; }
     try {
-      const msg = await Messages.send({ recipient_id: rid, subject: "Message TrocLab", body });
-      el.value = "";
-      const conv = convs.find(c => c.oid === rid);
-      if (conv) { conv.messages.push({...msg, sender_id: currentUser?.id, body}); openConv(rid); }
-      Toast.success("Message envoye !");
-    } catch (err) { Toast.error(err.message || "Erreur"); }
+      const msg = await Messages.send({ recipient_id: recipientId, subject: 'Message TrocLab', body });
+      bodyEl.value = '';
+      const conv = conversations.find(c => c.otherId === recipientId);
+      if (conv) { conv.messages.push({ ...msg, sender_id: currentUser?.id, body }); openConversation(recipientId); }
+      Toast.success('Message envoyé !');
+    } catch (err) { Toast.error(err.message || 'Erreur envoi'); }
   };
 
   window.refreshMessages = async () => {
     try {
       [inbox, sent] = await Promise.all([Messages.inbox(), Messages.sent()]);
-      convs = buildConversations(inbox, sent, currentUser?.id);
+      conversations = buildConversations(inbox, sent, currentUser?.id);
       renderConvList();
-      if (activeId) openConv(activeId);
-      Toast.success("Messages actualises");
-    } catch { Toast.error("Erreur"); }
+      if (activeConvId) openConversation(activeConvId);
+      Toast.success('Messages actualisés');
+    } catch { Toast.error('Erreur de rafraîchissement'); }
   };
 
   renderConvList();
 }
-
-
 // =============================================
 // MODALS & ACTIONS GLOBALES
 // =============================================
@@ -1398,7 +1405,7 @@ function openUpgradeModal() {
     <div class="pricing-feature">Soutien au projet</div>
     <div class="alert alert--info mt-lg">
       <span>ℹ️</span>
-      <span>Le paiement en ligne sera disponible prochainement. Contactez-nous à <a href="mailto:contact@troclab.fr" style="color:var(--color-sky)">contact@troclab.fr</a> pour vous abonner.</span>
+      <span>Le paiement en ligne sera disponible prochainement. Contactez-nous à <a href="mailto:alexane.groussard@gmail.com" style="color:var(--color-sky)">alexane.groussard@gmail.com</a> pour vous abonner.</span>
     </div>
   `);
 }
