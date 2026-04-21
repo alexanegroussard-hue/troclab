@@ -19,6 +19,7 @@ getDb().then(() => {
   app.use('/api/formations', require('./routes/formations'));
   app.use('/api/exchanges',  require('./routes/exchanges'));
   app.use('/api/messages',   require('./routes/messages'));
+  app.use('/api/alerts',     require('./routes/alerts'));  // ← ici
 
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', version: '1.0.0', name: 'TrocLab API' });
