@@ -508,7 +508,7 @@ function renderAbout(app) {
         <p class="text-muted font-ui text-small">
           TrocLab est une association loi 1901. Siège social : [Adresse à compléter]. SIRET : [à compléter].
           Hébergement : [à compléter]. Directeur de publication : [à compléter].
-          Contact : <a href="mailto:contact@troclab.fr" style="color:var(--color-forest)">contact@troclab.fr</a>
+          Contact : <a href="mailto:alexane.groussard@gmail.com" style="color:var(--color-forest)">alexane.groussard@gmail.com</a>
         </p>
 
         <div class="divider"></div>
@@ -516,7 +516,7 @@ function renderAbout(app) {
         <div class="alert alert--info">
           <strong>Une question, une idée ?</strong> TrocLab est une plateforme communautaire.
           Vos retours comptent vraiment. Écrivez-nous à
-          <a href="mailto:contact@troclab.fr" style="color:var(--color-sky)">contact@troclab.fr</a>
+          <a href="mailto:alexane.groussard@gmail.com" style="color:var(--color-sky)">alexane.groussard@gmail.com</a>
         </div>
 
       </div>
@@ -1364,7 +1364,7 @@ function openUpgradeModal() {
     <div class="pricing-feature">Soutien au projet</div>
     <div class="alert alert--info mt-lg">
       <span>ℹ️</span>
-      <span>Le paiement en ligne sera disponible prochainement. Contactez-nous à <a href="mailto:contact@troclab.fr" style="color:var(--color-sky)">contact@troclab.fr</a> pour vous abonner.</span>
+      <span>Le paiement en ligne sera disponible prochainement. Contactez-nous à <a href="mailto:alexane.groussard@gmail.com" style="color:var(--color-sky)">alexane.groussard@gmail.com</a> pour vous abonner.</span>
     </div>
   `);
 }
