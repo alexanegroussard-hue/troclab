@@ -146,10 +146,14 @@ function formationCardHTML(f, showActions = false, currentUserId = null) {
       </div>
 ${f.user_name ? `
   <div style="padding-top:10px;border-top:1px solid var(--color-border);display:flex;align-items:center;gap:8px;min-width:0">
-    <div class="avatar avatar--sm" style="background:${f.avatar_color||'#2D6A4F'};flex-shrink:0">${avatarInitials(f.user_name)}</div>
+    <a href="/profil/${f.user_id}" style="display:contents">
+  <div class="avatar avatar--sm" style="background:${f.avatar_color||'#2D6A4F'};flex-shrink:0;cursor:pointer">${avatarInitials(f.user_name)}</div>
+</a>
     <div style="min-width:0;flex:1;overflow:hidden">
-      <div class="font-ui text-small" style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(f.organisation||'')}</div>
-      <div class="font-ui" style="font-size:0.75rem;color:var(--color-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(f.user_name)}</div>
+      <a href="/profil/${f.user_id}" style="text-decoration:none;color:inherit">
+        <div class="font-ui text-small" style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(f.organisation||'')}</div>
+        <div class="font-ui" style="font-size:0.75rem;color:var(--color-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(f.user_name)}</div>
+      </a>
     </div>
 ${!isOwn ? `
       <button onclick="openMessageCompose('${f.user_id}','${escapeHtml(f.user_name)}')"
