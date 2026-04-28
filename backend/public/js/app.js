@@ -15,6 +15,7 @@ const routes = {
   '/inscription':       renderRegister,
   '/tableau-de-bord':   renderDashboard,
   '/messages':          renderMessages,
+  '/alertes':           renderAlertes,
   '/profil/:id':        renderProfil,
 };
 
@@ -88,6 +89,7 @@ function renderNav() {
     nav.innerHTML = `
       <a href="/catalogue" class="nav-link">Formations</a>
       <a href="/carte" class="nav-link">Carte</a>
+      <a href="/alertes" class="nav-link">Alertes</a>
       <a href="/messages" class="nav-link">
         Messages <span class="navbar__badge hidden" id="msg-badge">0</span>
       </a>
@@ -1430,3 +1432,111 @@ document.addEventListener('DOMContentLoaded', () => {
   renderNav();
   renderPage(window.location.pathname);
 });
+
+// =============================================
+// PAGE : ALERTES
+// =============================================
+async function renderAlertes(app) {
+  if (!Session.isLoggedIn()) { navigate('/connexion'); return; }
+  app.innerHTML = `
+    <div class="section">
+      <div class="container">
+        <div class="section__header">
+          <div class="section__eyebrow">Mon espace</div>
+          <h2>Mes alertes</h2>
+          <p class="text-muted font-ui" style="margin-top:8px">Configurez des alertes pour trouver les formations qui vous intéressent.</p>
+        </div>
+        <div class="card" style="max-width:520px;margin-bottom:var(--space-xl)">
+          <h4 style="margin-bottom:var(--space-md)">Nouvelle alerte</h4>
+          <div id="alert-error"></div>
+          <div class="form-group mb-md">
+            <label class="form-label">Catégorie</label>
+            <input class="form-input w-full" id="alert-category" placeholder="ex: Fabrication numérique…">
+          </div>
+          <div class="form-group mb-lg">
+            <label class="form-label">Mot-clé</label>
+            <input class="form-input w-full" id="alert-keyword" placeholder="ex: sérigraphie, Arduino…">
+          </div>
+          <p class="form-hint mb-lg">Remplissez l'un ou l'autre, ou les deux.</p>
+          <button class="btn btn--primary" onclick="submitAlert()">+ Ajouter l'alerte</button>
+        </div>
+        <h3 style="margin-bottom:var(--space-md)">Alertes configurées</h3>
+        <div id="alerts-list" style="margin-bottom:var(--space-xl)">
+          <div class="empty-state"><div class="spinner"></div></div>
+        </div>
+        <h3 style="margin-bottom:var(--space-md)">Formations correspondantes</h3>
+        <div id="alerts-matches" class="grid grid--3">
+          <div class="empty-state" style="grid-column:1/-1"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+  `;
+  loadAlertes();
+}
+
+async function loadAlertes() {
+  try {
+    const token = localStorage.getItem('troclab_token');
+    const headers = { Authorization: `Bearer ${token}` };
+    const [alerts, matches] = await Promise.all([
+      fetch('/api/alerts', { headers }).then(r => r.json()),
+      fetch('/api/alerts/matches', { headers }).then(r => r.json()),
+    ]);
+    const alertsList = document.getElementById('alerts-list');
+    if (alertsList) alertsList.innerHTML = alerts.length
+      ? alerts.map(a => `
+          <div class="card mb-md flex items-center justify-between" style="flex-wrap:wrap;gap:var(--space-md)">
+            <div class="flex gap-md" style="flex-wrap:wrap">
+              ${a.category ? `<span class="category-tag">📂 ${escapeHtml(a.category)}</span>` : ''}
+              ${a.keyword ? `<span class="category-tag">🔑 ${escapeHtml(a.keyword)}</span>` : ''}
+            </div>
+            <button onclick="deleteAlert('${a.id}')" class="btn btn--danger btn--sm">Supprimer</button>
+          </div>`).join('')
+      : `<div class="empty-state card"><div class="empty-state__icon">🔔</div><h3>Aucune alerte</h3><p>Ajoutez une alerte pour suivre les formations qui vous intéressent.</p></div>`;
+    const matchesEl = document.getElementById('alerts-matches');
+    const user = Session.getUser();
+    if (matchesEl) matchesEl.innerHTML = matches.length
+      ? matches.map(f => formationCardHTML(f, false, user?.id)).join('')
+      : `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state__icon">🌱</div><h3>Aucune formation correspondante</h3><p>Aucune formation ne correspond à vos alertes pour l'instant.</p></div>`;
+  } catch (err) {
+    Toast.error('Erreur lors du chargement des alertes');
+  }
+}
+
+async function submitAlert() {
+  const category = document.getElementById('alert-category')?.value.trim();
+  const keyword = document.getElementById('alert-keyword')?.value.trim();
+  const errEl = document.getElementById('alert-error');
+  if (!category && !keyword) {
+    errEl.innerHTML = `<div class="alert alert--error mb-md">Remplissez au moins un champ.</div>`;
+    return;
+  }
+  try {
+    const res = await fetch('/api/alerts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('troclab_token')}` },
+      body: JSON.stringify({ category, keyword })
+    });
+    if (!res.ok) throw await res.json();
+    document.getElementById('alert-category').value = '';
+    document.getElementById('alert-keyword').value = '';
+    errEl.innerHTML = '';
+    Toast.success('Alerte ajoutée !');
+    loadAlertes();
+  } catch (err) {
+    if (errEl) errEl.innerHTML = `<div class="alert alert--error mb-md">${err.error || 'Erreur'}</div>`;
+  }
+}
+
+async function deleteAlert(id) {
+  try {
+    await fetch(`/api/alerts/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${localStorage.getItem('troclab_token')}` }
+    });
+    Toast.success('Alerte supprimée');
+    loadAlertes();
+  } catch {
+    Toast.error('Erreur lors de la suppression');
+  }
+}
