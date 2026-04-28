@@ -89,7 +89,6 @@ function renderNav() {
     nav.innerHTML = `
       <a href="/catalogue" class="nav-link">Formations</a>
       <a href="/carte" class="nav-link">Carte</a>
-      <a href="/alertes" class="nav-link">Alertes</a>
       <a href="/messages" class="nav-link">
         Messages <span class="navbar__badge hidden" id="msg-badge">0</span>
       </a>
@@ -301,6 +300,7 @@ async function renderCatalogue(app) {
         <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;align-items:center;margin-bottom:var(--space-lg)">
           <input type="text" class="form-input" id="search-input" placeholder="Rechercher une formation…" style="flex:1;min-width:200px;max-width:360px">
           <div class="filters-bar" id="type-filters">
+          <button class="filter-chip" data-type="my-alerts">🔔 Mes alertes</button>
             <button class="filter-chip active" data-type="">Toutes</button>
             <button class="filter-chip" data-type="offered">🌱 Proposées</button>
             <button class="filter-chip" data-type="wanted">🔍 Recherchées</button>
@@ -338,9 +338,22 @@ async function renderCatalogue(app) {
     catFilters.appendChild(btn);
   });
 
-  function filterAndRender() {
+async function filterAndRender() {
     let list = allFormations;
-    if (activeType) list = list.filter(f => f.type === activeType);
+
+    if (activeType === 'my-alerts') {
+      if (!Session.isLoggedIn()) {
+        document.getElementById('formations-grid').innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state__icon">🔔</div><h3>Connectez-vous pour voir vos alertes</h3><a href="/connexion" class="btn btn--primary mt-md">Se connecter</a></div>`;
+        return;
+      }
+      try {
+        const res = await fetch('/api/alerts/matches', { headers: { Authorization: `Bearer ${localStorage.getItem('troclab_token')}` } });
+        list = await res.json();
+      } catch { list = []; }
+    } else {
+      if (activeType) list = list.filter(f => f.type === activeType);
+    }
+
     if (activeCategory) list = list.filter(f => f.category === activeCategory);
     if (searchValue) {
       const q = searchValue.toLowerCase();
@@ -712,7 +725,7 @@ async function renderDashboard(app) {
           <button class="filter-chip active" data-tab="overview">Vue d'ensemble</button>
           <button class="filter-chip" data-tab="formations">Mes formations</button>
           <button class="filter-chip" data-tab="exchanges">Mes échanges</button>
-          <button class="filter-chip" data-tab="profile">Mon profil</button>
+          <button class="filter-chip" data-tab="alerts">Mes alertes</button>
         </div>
 
         <div id="dash-content">
@@ -741,7 +754,7 @@ async function renderDashboard(app) {
     if (tab === 'overview') renderDashOverview(content, freshUser, formations, exchanges);
     else if (tab === 'formations') renderDashFormations(content, formations, freshUser);
     else if (tab === 'exchanges') renderDashExchanges(content, exchanges, freshUser);
-    else if (tab === 'profile') renderDashProfile(content, freshUser);
+    else if (tab === 'alerts') renderDashAlerts(content);
   }
 
   renderTab('overview');
@@ -1539,4 +1552,35 @@ async function deleteAlert(id) {
   } catch {
     Toast.error('Erreur lors de la suppression');
   }
+}
+
+// =============================================
+// DASHBOARD : ONGLET ALERTES
+// =============================================
+async function renderDashAlerts(el) {
+  el.innerHTML = `
+    <div class="card" style="max-width:520px;margin-bottom:var(--space-xl)">
+      <h4 style="margin-bottom:var(--space-md)">Nouvelle alerte</h4>
+      <div id="alert-error"></div>
+      <div class="form-group mb-md">
+        <label class="form-label">Catégorie</label>
+        <input class="form-input w-full" id="alert-category" placeholder="ex: Fabrication numérique…">
+      </div>
+      <div class="form-group mb-lg">
+        <label class="form-label">Mot-clé</label>
+        <input class="form-input w-full" id="alert-keyword" placeholder="ex: sérigraphie, Arduino…">
+      </div>
+      <p class="form-hint mb-lg">Remplissez l'un ou l'autre, ou les deux.</p>
+      <button class="btn btn--primary" onclick="submitAlert()">+ Ajouter l'alerte</button>
+    </div>
+    <h3 style="margin-bottom:var(--space-md)">Alertes configurées</h3>
+    <div id="alerts-list" style="margin-bottom:var(--space-xl)">
+      <div class="empty-state"><div class="spinner"></div></div>
+    </div>
+    <h3 style="margin-bottom:var(--space-md)">Formations correspondantes</h3>
+    <div id="alerts-matches" class="grid grid--3">
+      <div class="empty-state" style="grid-column:1/-1"><div class="spinner"></div></div>
+    </div>
+  `;
+  loadAlertes();
 }
