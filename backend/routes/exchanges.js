@@ -9,33 +9,9 @@ const MAX_IMBALANCE = 5;
 // GET /api/exchanges
 router.get('/', auth, async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from('exchanges')
-      .select(`
-        *,
-        formations(title, category),
-        traveler:users!exchanges_traveler_id_fkey(name, organisation),
-        host:users!exchanges_host_id_fkey(name, organisation)
-      `)
-      .or(`traveler_id.eq.${req.user.id},host_id.eq.${req.user.id}`)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    const exchanges = data.map(e => ({
-      ...e,
-      formation_title: e.formations?.title,
-      formation_category: e.formations?.category,
-      traveler_name: e.traveler?.name,
-      traveler_org: e.traveler?.organisation,
-      host_name: e.host?.name,
-      host_org: e.host?.organisation,
-      formations: undefined, traveler: undefined, host: undefined
-    }));
-
-    res.json(exchanges);
+    // ... code existant
   } catch (err) {
-    console.error("EXCHANGES ERROR:", err.message, err.details || "");
+    console.error('EXCHANGES ERROR:', err.message, err.details); // ← ajouter
     res.status(500).json({ error: err.message });
   }
 });
@@ -75,7 +51,6 @@ router.post('/', auth, async (req, res) => {
 
     res.status(201).json(exchange);
   } catch (err) {
-    console.error("EXCHANGES ERROR:", err.message, err.details || "");
     res.status(500).json({ error: err.message });
   }
 });
@@ -103,7 +78,6 @@ router.put('/:id/status', auth, async (req, res) => {
 
     res.json({ success: true, status });
   } catch (err) {
-    console.error("EXCHANGES ERROR:", err.message, err.details || "");
     res.status(500).json({ error: err.message });
   }
 });

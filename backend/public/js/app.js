@@ -294,6 +294,7 @@ async function renderCatalogue(app) {
         <div class="section__header">
           <div class="section__eyebrow">Toutes les formations</div>
           <h2>Catalogue</h2>
+          <p class="text-muted font-ui" style="margin-top:var(--space-sm);max-width:600px"><strong>Trouvez la formation qu'il vous faut.</strong> Utilisez les filtres par type, catégorie ou mot-clé pour affiner votre recherche. Une fois la formation repérée, contactez directement la structure via la messagerie intégrée.</p>
         </div>
 
         <!-- Barre de filtres -->
