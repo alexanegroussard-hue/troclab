@@ -153,7 +153,7 @@ ${f.user_name ? `
     </div>
 ${!isOwn ? `
       <button onclick="openMessageCompose('${f.user_id}','${escapeHtml(f.user_name)}')"
-        class="btn btn--primary btn--sm" style="flex-shrink:0;margin-left:auto">✉</button>
+        class="btn btn--primary btn--sm" style="flex-shrink:0;margin-left:auto">Message</button>
     ` : ''}
   </div>
 ` : ''}
