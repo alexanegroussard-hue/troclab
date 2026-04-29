@@ -1086,7 +1086,7 @@ async function renderMessages(app) {
 
   function buildConversations(inbox, sent, currentUserId) {
     const convMap = {};
-    [...inbox, ...sent].forEach(m => {
+    [...inbox, ...sent].filter((m, i, arr) => arr.findIndex(x => x.id === m.id) === i).forEach(m => {
       const otherId = m.sender_id === currentUserId ? m.recipient_id : m.sender_id;
       const otherName = m.sender_id === currentUserId ? (m.recipient_name || 'Inconnu') : (m.sender_name || 'Inconnu');
       const otherOrg = m.sender_id === currentUserId ? (m.recipient_org || '') : (m.sender_org || '');
