@@ -1197,7 +1197,7 @@ function openNewFormationModal() {
       <label class="form-label">Catégorie *</label>
       <select class="form-select w-full" id="f-cat">
   <option value="">-- Choisir une catégorie --</option>
-  <option value="Fabrication & making">Fabrication & making</option>
+  <option value="Fabrication">Fabrication</option>
   <option value="Numérique & tech">Numérique & tech</option>
   <option value="Communication & design">Communication & design</option>
   <option value="Gestion & comptabilité">Gestion & comptabilité</option>
