@@ -1281,7 +1281,7 @@ async function confirmPublishFormation(type, title, desc, category, duration, pa
     });
     const data = await res.json();
     if (!res.ok) throw data;
-    Modal.hide();
+    Modal.close();
     Toast.success('Formation publiée !');
     navigate('/catalogue');
   } catch (err) {
