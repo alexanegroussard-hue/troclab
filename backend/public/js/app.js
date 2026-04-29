@@ -729,6 +729,7 @@ async function renderDashboard(app) {
           <button class="filter-chip" data-tab="formations">Mes formations</button>
           <button class="filter-chip" data-tab="exchanges">Mes échanges</button>
           <button class="filter-chip" data-tab="alerts">Mes alertes</button>
+          <button class="filter-chip" data-tab="profile">Mon profil</button>
         </div>
 
         <div id="dash-content">
@@ -758,6 +759,7 @@ async function renderDashboard(app) {
     else if (tab === 'formations') renderDashFormations(content, formations, freshUser);
     else if (tab === 'exchanges') renderDashExchanges(content, exchanges, freshUser);
     else if (tab === 'alerts') renderDashAlerts(content);
+    else if (tab === 'profile') renderDashProfile(content, freshUser);
   }
 
   renderTab('overview');
