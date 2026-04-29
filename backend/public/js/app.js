@@ -1186,7 +1186,6 @@ async function renderMessages(app) {
 function openNewFormationModal() {
   if (!Session.isLoggedIn()) { navigate('/connexion'); return; }
   Modal.show('Ajouter une formation', `
-    <div style="display:grid;grid-template-columns:1fr 280px;gap:var(--space-lg)"><div>
     <div id="form-error"></div>
     <div class="form-group mb-md">
       <label class="form-label">Titre *</label>
@@ -1231,7 +1230,6 @@ function openNewFormationModal() {
       </select>
     </div>
   `, `
-  </div><div style="background:var(--color-sand);border-radius:var(--radius-md);padding:var(--space-md);font-family:var(--font-ui);font-size:0.85rem;line-height:1.6"><div style="font-weight:700;margin-bottom:var(--space-sm)">📋 Recommandations</div><p style="margin-bottom:var(--space-sm)">✅ Formations <strong>gratuites</strong> uniquement — TrocLab repose sur le troc.</p><p style="margin-bottom:var(--space-sm)">✅ Décrivez le niveau requis et le matériel fourni.</p><p style="margin-bottom:var(--space-sm)">✅ Soyez réaliste sur le nombre de participants.</p><p>✅ Une bonne description reçoit plus de demandes !</p></div></div>
     <button class="btn btn--primary w-full" onclick="submitNewFormation()">Publier la formation</button>
   `);
 }
