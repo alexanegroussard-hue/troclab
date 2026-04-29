@@ -729,7 +729,7 @@ async function renderDashboard(app) {
           <button class="filter-chip" data-tab="formations">Mes formations</button>
           <button class="filter-chip" data-tab="exchanges">Mes échanges</button>
           <button class="filter-chip" data-tab="alerts">Mes alertes</button>
-          <button class="filter-chip" data-tab="admin">Modération</button>
+          ${Session.getUser()?.is_admin ? '<button class="filter-chip" data-tab="admin">Modération</button>' : ''}
           <button class="filter-chip" data-tab="profile">Mon profil</button>
         </div>
 
