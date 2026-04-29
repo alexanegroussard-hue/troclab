@@ -1278,18 +1278,18 @@ async function editFormation(id) {
     <div class="form-group mb-md">
       <label class="form-label">Catégorie</label>
       <select class="form-select w-full" id="ef-cat">
-  <option value="">-- Choisir une catégorie --</option>
-  <option value="Fabrication & making" ${f.category==='Fabrication & making'?'selected':''}>Fabrication & making</option>
-  <option value="Numérique & tech" ${f.category==='Numérique & tech'?'selected':''}>Numérique & tech</option>
-  <option value="Communication & design" ${f.category==='Communication & design'?'selected':''}>Communication & design</option>
-  <option value="Gestion & comptabilité" ${f.category==='Gestion & comptabilité'?'selected':''}>Gestion & comptabilité</option>
-  <option value="Animation & médiation" ${f.category==='Animation & médiation'?'selected':''}>Animation & médiation</option>
-  <option value="Écologie & transitions" ${f.category==='Écologie & transitions'?'selected':''}>Écologie & transitions</option>
-  <option value="Arts appliqués" ${f.category==='Arts appliqués'?'selected':''}>Arts appliqués</option>
-  <option value="Gestion de projet" ${f.category==='Gestion de projet'?'selected':''}>Gestion de projet</option>
-  <option value="Management associatif" ${f.category==='Management associatif'?'selected':''}>Management associatif</option>
-  <option value="Juridique & administratif" ${f.category==='Juridique & administratif'?'selected':''}>Juridique & administratif</option>
-  <option value="Autre" ${f.category==='Autre'?'selected':''}>Autre</option>
+  <option value="">-- Catégorie --</option>
+<option value="Fabrication">Fabrication</option>
+<option value="Numérique">Numérique</option>
+<option value="Com & design">Com & design</option>
+<option value="Gestion">Gestion</option>
+<option value="Juridique">Juridique</option>
+<option value="Administratif">Administratif</option>
+<option value="Relationnel">Relationnel</option>
+<option value="Animation">Animation</option>
+<option value="Écologie">Écologie</option>
+<option value="Arts appliqués">Arts appliqués</option>
+<option value="Autre">Autre</option>
 </select>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)" class="mb-lg">

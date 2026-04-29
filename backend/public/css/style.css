@@ -8,25 +8,7 @@
    VARIABLES DE CONFIGURATION — MODIFIER ICI
    ============================================= */
 :root {
-  /* Palette principale */
-  --color-forest: #F08A00;
-  --color-forest-dark: #1B4332;
-  --color-forest-light: #52B788;
-  --color-moss: #74C69D;
-  --color-sage: #B7E4C7;
-  --color-cream: #F5F0E8;
-  --color-sand: #EDE0CC;
-  --color-clay: #C9A87C;
-  --color-terracotta: #E76F51;
-  --color-rust: #BC4749;
-  --color-sky: #457B9D;
-  --color-charcoal: #2C3E35;
-  --color-text: #1A2E25;
-  --color-text-muted: #5A7A6A;
-  --color-border: #D4C9B4;
-  --color-white: #FEFCF8;
-
-  /* Typographie — modifier pour changer les polices */
+   /* Typographie — modifier pour changer les polices */
   --font-display: 'Playfair Display', Georgia, serif;
   --font-body: 'Source Serif 4', 'Georgia', serif;
   --font-ui: 'DM Sans', system-ui, sans-serif;

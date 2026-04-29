@@ -1,0 +1,31 @@
+/* =============================================
+   THÈME TROCLAB — modifiez uniquement ce fichier
+   pour changer les couleurs du site
+   ============================================= */
+:root {
+  /* Couleur principale (boutons, liens actifs) */
+  --color-forest: #F08A00;
+  --color-forest-dark: #3B3D00;
+  --color-forest-light: #77C152;
+
+  /* Verts */
+  --color-moss: #77C152;
+  --color-sage: #C5EAA7;
+
+  /* Fonds */
+  --color-cream: #F0F5D0;
+  --color-sand: #C5EAA7;
+  --color-clay: #C9A87C;
+
+  /* Accents */
+  --color-terracotta: #F08A00;
+  --color-rust: #BC4749;
+  --color-sky: #457B9D;
+
+  /* Texte */
+  --color-charcoal: #3B3D00;
+  --color-text: #3B3D00;
+  --color-text-muted: #6B7A2A;
+  --color-border: #D4C9B4;
+  --color-white: #FEFCF8;
+}
