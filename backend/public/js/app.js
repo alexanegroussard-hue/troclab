@@ -1684,8 +1684,8 @@ async function renderDashAdmin(el) {
         ${formations.map(f => `
           <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);flex-wrap:wrap;padding:var(--space-md)">
             <div>
-              <div class="font-ui text-small" style="font-weight:600">${escapeHtml(f.title)}</div>
-              <div class="font-ui text-small text-muted">${escapeHtml(f.organisation||'')} — ${escapeHtml(f.category)} — ${f.status}</div>
+              <a href="/formation/${f.id}" style="font-weight:600;font-family:var(--font-ui);font-size:0.875rem;color:var(--color-forest)">${escapeHtml(f.title)}</a>
+              <a href="/profil/${f.user_id}" style="font-size:0.875rem;font-family:var(--font-ui);color:var(--color-text-muted)">${escapeHtml(f.organisation||'')} — ${escapeHtml(f.category)}</a>
             </div>
             <button onclick="adminDeleteFormation('${f.id}')" class="btn btn--danger btn--sm">Supprimer</button>
           </div>
