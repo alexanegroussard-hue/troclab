@@ -5,12 +5,12 @@
   --color-forest-light: #cae3ff;
 
   /* Bleus */
-  --color-moss: #a9d2ff;
+  --color-moss: #cee6ff;
   --color-sage: #cde3ff;
 
   /* Fonds */
-  --color-cream: #ffffff;
-  --color-sand: #ebf9ff;
+  --color-cream: #ebf7ff;
+  --color-sand: #def5ff;
   --color-clay: #d0e6ff;
 
   /* Accents */
@@ -22,7 +22,7 @@
   --color-charcoal: #1B2F4E;
   --color-text: #1B2F4E;
   --color-text-muted: #4A6080;
-  --color-border: #ffffff;
+  --color-border: #ebebeb;
   --color-white: #ffffff;
 
   --font-display: 'Lusitana', Georgia, serif;
