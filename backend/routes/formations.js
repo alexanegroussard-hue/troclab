@@ -122,3 +122,25 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 module.exports = router;
+// GET /api/formations/:id
+router.get('/:id', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('formations')
+      .select('*, users(name, organisation, organisation_type, city, avatar_color)')
+      .eq('id', req.params.id)
+      .single();
+    if (error) throw error;
+    const f = {
+      ...data,
+      user_name: data.users?.name,
+      organisation: data.users?.organisation,
+      city: data.users?.city,
+      avatar_color: data.users?.avatar_color,
+      users: undefined
+    };
+    res.json(f);
+  } catch (err) {
+    res.status(404).json({ error: 'Formation introuvable' });
+  }
+});

@@ -136,8 +136,8 @@ function formationCardHTML(f, showActions = false, currentUserId = null) {
         <span class="category-tag">${f.category}</span>
       </div>
       <div>
-        <h4 style="margin-bottom:6px">${escapeHtml(f.title)}</h4>
-        <p class="text-small text-muted" style="line-height:1.5">${escapeHtml(f.description)}</p>
+        <h4 style="margin-bottom:6px;cursor:pointer" onclick="navigate('/formation/${f.id}')">${escapeHtml(f.title)}</h4>
+<p class="text-small text-muted" style="line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${escapeHtml(f.description)}</p>
       </div>
       <div class="flex gap-md text-small text-muted font-ui" style="flex-wrap:wrap">
         <span>⏱ ${f.duration_hours}h</span>

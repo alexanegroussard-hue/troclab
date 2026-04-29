@@ -17,6 +17,7 @@ const routes = {
   '/messages':          renderMessages,
   '/alertes':           renderAlertes,
   '/profil/:id':        renderProfil,
+  '/formation/:id': renderFormation,
 };
 
 function navigate(path) {
@@ -123,10 +124,11 @@ async function renderHome(app) {
       <div class="container">
         <div class="hero__content">
           <div class="hero__eyebrow">Plateforme de réciprocité</div>
-          <h1>Échangez des formations,<br><em>sans argent</em></h1>
+          <h1>Faciliter les échanges de compétences<br><em>facilement et à moindre coût ?</em></h1>
           <p class="hero__sub">
-            TrocLab connecte les fablabs, associations, coopératives et tiers-lieux pour
-            partager leurs savoir-faire. Vous formez, vous vous formez — en équilibre.
+            C'est l'objectif de Troclab.<br>
+            TrocLab connecte les associations, coopératives, fablabs et tiers-lieux pour
+            partager leurs savoir-faire. Vous formez, vous vous formez — en équilibre. Et surtout, vous restez autonomes dans ce que vous pouvez proposer à vos bénévoles.
           </p>
           <div class="hero__cta">
             ${user
@@ -1610,4 +1612,50 @@ async function renderDashAlerts(el) {
     </div>
   `;
   loadAlertes();
+}
+
+async function renderFormation(app) {
+  const id = window.location.pathname.split('/').pop();
+  app.innerHTML = `<div class="section"><div class="container" style="max-width:700px">
+    <button onclick="history.back()" class="btn btn--ghost btn--sm" style="margin-bottom:var(--space-lg)">← Retour</button>
+    <div id="formation-detail"><div class="empty-state"><div class="spinner"></div></div></div>
+  </div></div>`;
+  try {
+    const res = await fetch(`/api/formations/${id}`);
+    if (!res.ok) throw new Error();
+    const f = await res.json();
+    const user = Session.getUser();
+    const isOwn = f.user_id === user?.id;
+    document.getElementById('formation-detail').innerHTML = `
+      <div class="card" style="gap:var(--space-md)">
+        <div class="flex items-center justify-between gap-md" style="flex-wrap:wrap">
+          ${formationTypeHTML(f.type)}
+          <span class="category-tag">${escapeHtml(f.category)}</span>
+        </div>
+        <h2 style="margin:0">${escapeHtml(f.title)}</h2>
+        <p style="line-height:1.7;white-space:pre-wrap">${escapeHtml(f.description)}</p>
+        <div class="flex gap-lg text-small text-muted font-ui" style="flex-wrap:wrap;padding:var(--space-md) 0;border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border)">
+          <span>⏱ ${f.duration_hours}h</span>
+          <span>👥 ${f.max_participants} participants max</span>
+          ${f.city ? `<span>📍 ${escapeHtml(f.city)}</span>` : ''}
+        </div>
+        ${f.user_name ? `
+          <div class="flex items-center gap-md" style="flex-wrap:wrap">
+            <a href="/profil/${f.user_id}" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;flex:1">
+              <div class="avatar" style="background:${f.avatar_color||'#2D6A4F'}">${avatarInitials(f.user_name)}</div>
+              <div>
+                <div class="font-ui" style="font-weight:600">${escapeHtml(f.organisation||'')}</div>
+                <div class="font-ui text-small text-muted">${escapeHtml(f.user_name)}</div>
+              </div>
+            </a>
+            ${!isOwn && f.type === 'offered' ? `
+              <button onclick="openMessageCompose('${f.user_id}','${escapeHtml(f.user_name)}')" class="btn btn--primary">Contacter la structure</button>
+            ` : ''}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  } catch {
+    document.getElementById('formation-detail').innerHTML = `<div class="empty-state"><h3>Formation introuvable</h3></div>`;
+  }
 }
