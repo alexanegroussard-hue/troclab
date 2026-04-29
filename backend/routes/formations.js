@@ -111,7 +111,7 @@ router.put('/:id', auth, async (req, res) => {
 // DELETE /api/formations/:id
 router.delete('/:id', auth, async (req, res) => {
   try {
-    const existing = await get('formations', { id: req.params.id, user_id: req.user.id });
+    const existing = await get('formations', { id: req.params.id });
     if (!existing) return res.status(404).json({ error: 'Formation introuvable ou non autorisée' });
 
     await update('formations', { id: req.params.id }, { status: 'archived' });
