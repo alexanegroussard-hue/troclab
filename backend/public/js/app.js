@@ -939,6 +939,13 @@ function renderDashProfile(el, user) {
         <input class="form-input w-full" id="p-website" placeholder="https://monfablab.org" value="${escapeHtml(user.website||'')}">
       </div>
       <div class="form-group mb-md">
+  <label class="form-label" style="display:flex;align-items:center;justify-content:space-between">
+    <span>Notifications email</span>
+    <input type="checkbox" id="p-email-notif" ${user.email_notifications !== false ? 'checked' : ''} style="width:20px;height:20px;cursor:pointer">
+  </label>
+  <p class="form-hint">Recevoir un email quand vous recevez un message sur TrocLab</p>
+</div>
+      <div class="form-group mb-md">
         <label class="form-label">Type de structure</label>
         <select class="form-select w-full" id="p-orgtype">
           ${['association','fablab','tiers-lieu','coop','ess','autre'].map(t =>
@@ -967,6 +974,7 @@ async function saveProfile() {
     city: document.getElementById('p-city')?.value.trim(),
     bio: document.getElementById('p-bio')?.value.trim(),
     website: document.getElementById('p-website')?.value.trim(),
+    email_notifications: document.getElementById('p-email-notif')?.checked,
   };
   try {
     const updated = await Users.updateMe(payload);

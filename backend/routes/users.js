@@ -41,7 +41,8 @@ router.get('/:id', async (req, res) => {
 });
 
 router.put('/me', auth, async (req, res) => {
-  const { name, organisation, organisation_type, bio, city, latitude, longitude, website } = req.body;
+  const { name, organisation, organisation_type, bio, city, latitude, longitude, website, email_notifications } = req.body;
+    if (email_notifications !== undefined) payload.email_notifications = email_notifications;
   try {
     const payload = {};
     if (name) payload.name = name;
