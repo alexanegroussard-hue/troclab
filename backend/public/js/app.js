@@ -1186,6 +1186,7 @@ async function renderMessages(app) {
 function openNewFormationModal() {
   if (!Session.isLoggedIn()) { navigate('/connexion'); return; }
   Modal.show('Ajouter une formation', `
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:var(--space-lg)"><div>
     <div id="form-error"></div>
     <div class="form-group mb-md">
       <label class="form-label">Titre *</label>
@@ -1230,37 +1231,63 @@ function openNewFormationModal() {
       </select>
     </div>
   `, `
+  </div><div style="background:var(--color-sand);border-radius:var(--radius-md);padding:var(--space-md);font-family:var(--font-ui);font-size:0.85rem;line-height:1.6"><div style="font-weight:700;margin-bottom:var(--space-sm)">📋 Recommandations</div><p style="margin-bottom:var(--space-sm)">✅ Formations <strong>gratuites</strong> uniquement — TrocLab repose sur le troc.</p><p style="margin-bottom:var(--space-sm)">✅ Décrivez le niveau requis et le matériel fourni.</p><p style="margin-bottom:var(--space-sm)">✅ Soyez réaliste sur le nombre de participants.</p><p>✅ Une bonne description reçoit plus de demandes !</p></div></div>
     <button class="btn btn--primary w-full" onclick="submitNewFormation()">Publier la formation</button>
   `);
 }
 
 async function submitNewFormation() {
-  const payload = {
-    title: document.getElementById('f-title')?.value.trim(),
-    description: document.getElementById('f-desc')?.value.trim(),
-    category: document.getElementById('f-cat')?.value.trim(),
-    duration_hours: parseInt(document.getElementById('f-duration')?.value) || 3,
-    max_participants: parseInt(document.getElementById('f-participants')?.value) || 8,
-    type: document.getElementById('f-type')?.value,
-  };
+  const title = document.getElementById('f-title')?.value.trim();
+  const desc = document.getElementById('f-desc')?.value.trim();
+  const category = document.getElementById('f-cat')?.value;
+  const type = document.getElementById('f-type')?.value;
+  const duration = document.getElementById('f-duration')?.value;
+  const participants = document.getElementById('f-participants')?.value;
   const errEl = document.getElementById('form-error');
-  if (!payload.title || !payload.description || !payload.category) {
-    errEl.innerHTML = `<div class="alert alert--error mb-md">Veuillez remplir les champs obligatoires.</div>`;
+
+  if (!title || !desc || !category || !type) {
+    errEl.innerHTML = `<div class="alert alert--error mb-md">Remplissez tous les champs obligatoires.</div>`;
     return;
   }
+
+  // Confirmation avant publication
+  Modal.show('Avant de publier', `
+    <div style="font-family:var(--font-ui);line-height:1.7">
+      <p style="margin-bottom:var(--space-md)">En publiant cette formation, vous confirmez qu'elle respecte les règles de TrocLab :</p>
+      <ul style="margin-bottom:var(--space-md);padding-left:var(--space-lg)">
+        <li>✅ La formation est <strong>gratuite</strong> — TrocLab repose sur le troc</li>
+        <li>✅ Le contenu est <strong>réel et réalisable</strong> par votre structure</li>
+        <li>✅ La description est <strong>claire et honnête</strong></li>
+      </ul>
+      <div style="background:#FFF3CD;border-radius:var(--radius-md);padding:var(--space-md);font-size:0.85rem;margin-bottom:var(--space-lg)">
+        ⚠️ <strong>Attention :</strong> toute formation ne respectant pas ces conditions pourra être retirée du catalogue par l'équipe TrocLab, qui privilégie la sécurité et la facilité d'usage de ses membres.
+      </div>
+      <button class="btn btn--primary w-full" onclick="confirmPublishFormation('${type}','${encodeURIComponent(title)}','${encodeURIComponent(desc)}','${encodeURIComponent(category)}',${duration},${participants})">
+        ✅ Je confirme et publie la formation
+      </button>
+    </div>
+  `);
+}
+
+async function confirmPublishFormation(type, title, desc, category, duration, participants) {
   try {
-    await Formations.create(payload);
-    Modal.close();
+    const res = await fetch('/api/formations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('troclab_token')}` },
+      body: JSON.stringify({
+        title: decodeURIComponent(title),
+        description: decodeURIComponent(desc),
+        category: decodeURIComponent(category),
+        type, duration_hours: duration, max_participants: participants
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw data;
+    Modal.hide();
     Toast.success('Formation publiée !');
-    if (window.location.pathname === '/tableau-de-bord') renderPage('/tableau-de-bord');
-    else if (window.location.pathname === '/catalogue') renderPage('/catalogue');
+    navigate('/catalogue');
   } catch (err) {
-    if (err.data?.upgrade_required) {
-      Modal.close();
-      openUpgradeModal();
-    } else {
-      errEl.innerHTML = `<div class="alert alert--error mb-md">${err.message}</div>`;
-    }
+    Toast.error(err.error || err.message || 'Erreur');
   }
 }
 
