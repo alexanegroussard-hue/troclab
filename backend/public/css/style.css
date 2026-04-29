@@ -385,7 +385,7 @@ h4 { font-size: 1.1rem; }
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(116, 198, 157, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(75, 182, 75, 0.15) 0%, transparent 60%),
     radial-gradient(ellipse 60% 40% at 80% 80%, rgba(231, 111, 81, 0.1) 0%, transparent 50%);
 }
 
