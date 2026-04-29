@@ -8,12 +8,6 @@
    VARIABLES DE CONFIGURATION — MODIFIER ICI
    ============================================= */
 :root {
-   /* Typographie — modifier pour changer les polices */
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-body: 'Source Serif 4', 'Georgia', serif;
-  --font-ui: 'DM Sans', system-ui, sans-serif;
-  --font-mono: 'Courier New', monospace;
-
   /* Espacements */
   --space-xs: 4px;
   --space-sm: 8px;
@@ -234,7 +228,7 @@ h4 { font-size: 1.1rem; }
   letter-spacing: 0.05em;
 }
 
-.badge--offered { background: #D8F3DC; color: var(--color-forest-dark); }
+.badge--offered { background: #c3fdff; color: var(--color-forest-dark); }
 .badge--wanted  { background: #FFE8D6; color: #8B3A1A; }
 
 .category-tag {
@@ -385,7 +379,7 @@ h4 { font-size: 1.1rem; }
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(75, 182, 75, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(3, 17, 139, 0.301) 0%, transparent 60%),
     radial-gradient(ellipse 60% 40% at 80% 80%, rgba(231, 111, 81, 0.1) 0%, transparent 50%);
 }
 
