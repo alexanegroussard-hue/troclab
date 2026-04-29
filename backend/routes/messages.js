@@ -2,6 +2,7 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { get, insert, update, supabase } = require('../db');
 const { auth } = require('../middleware/auth');
+const { sendMessageNotification } = require('../resend');
 
 const router = express.Router();
 
@@ -77,6 +78,17 @@ router.post('/', auth, async (req, res) => {
       read: false
     });
     res.status(201).json(message);
+    // Envoyer email de notification si activé
+if (recipient.email_notifications !== false) {
+  const sender = await get('users', { id: req.user.id });
+  sendMessageNotification({
+    toEmail: recipient.email,
+    toName: recipient.name,
+    fromName: sender.name,
+    fromOrg: sender.organisation,
+    messageBody: body
+  });
+}
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
