@@ -1158,7 +1158,7 @@ async function renderMessages(app) {
       + '<strong style="color:var(--color-forest)">💡 Pour bien organiser votre échange :</strong><br>'
       + 'Précisez la <strong>formation souhaitée</strong>, les <strong>dates envisagées</strong>, le <strong>nombre de participants</strong>, le <strong>lieu</strong> et toute contrainte particulière.'
       + '</div>'
-      + '<div id="chat-thread" style="flex:1;overflow-y:auto;padding:var(--space-md) var(--space-lg);display:flex;flex-direction:column-reverse;gap:12px">' + thread + '</div>'
+      + '<div id="chat-thread" style="flex:1;overflow-y:auto;padding:var(--space-md) var(--space-lg);display:flex;flex-direction:column;gap:12px">' + thread + '</div>'
       + '<div style="padding:var(--space-md) var(--space-lg);border-top:1px solid var(--color-border);display:flex;gap:8px;align-items:flex-end">'
       + '<textarea id="reply-body" class="form-textarea" rows="2" placeholder="Votre message…" style="flex:1;resize:none" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();sendReply(\'' + otherId + '\')}"></textarea>'
       + '<button class="btn btn--primary" onclick="sendReply(\'' + otherId + '\')">Envoyer</button>'
