@@ -145,7 +145,7 @@ function formationCardHTML(f, showActions = false, currentUserId = null) {
         ${f.city ? `<span>📍 ${escapeHtml(f.city)}</span>` : ''}
       </div>
 ${f.user_name ? `
-  <div style="padding-top:10px;border-top:1px solid var(--color-border);display:flex;flex-direction:column;gap:8px;min-width:0">
+  <div style="padding-top:10px;border-top:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0">
     <a href="/profil/${f.user_id}" style="display:contents">
   <div class="avatar avatar--sm" style="background:${f.avatar_color||'#2D6A4F'};flex-shrink:0;cursor:pointer">${avatarInitials(f.user_name)}</div>
 </a>
@@ -157,7 +157,7 @@ ${f.user_name ? `
     </div>
 ${!isOwn ? `
       <button onclick="openMessageCompose('${f.user_id}','${escapeHtml(f.user_name)}')"
-        class="btn btn--primary btn--sm" style="flex-shrink:0;align-self:flex-start">Message</button>
+        class="btn btn--primary btn--sm" style="flex-shrink:0;margin-left:auto">Message</button>
     ` : ''}
   </div>
 ` : ''}
