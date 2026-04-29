@@ -1,31 +1,33 @@
-/* =============================================
-   THÈME TROCLAB — modifiez uniquement ce fichier
-   pour changer les couleurs du site
-   ============================================= */
 :root {
   /* Couleur principale (boutons, liens actifs) */
-  --color-forest: #F08A00;
-  --color-forest-dark: #3B3D00;
-  --color-forest-light: #77C152;
+  --color-forest: #ff9f21;
+  --color-forest-dark: #2a94be;
+  --color-forest-light: #cae3ff;
 
-  /* Verts */
-  --color-moss: #77C152;
-  --color-sage: #C5EAA7;
+  /* Bleus */
+  --color-moss: #a9d2ff;
+  --color-sage: #cde3ff;
 
   /* Fonds */
-  --color-cream: #F0F5D0;
-  --color-sand: #C5EAA7;
-  --color-clay: #C9A87C;
+  --color-cream: #ffffff;
+  --color-sand: #ebf9ff;
+  --color-clay: #ca0000;
 
   /* Accents */
-  --color-terracotta: #F08A00;
-  --color-rust: #BC4749;
-  --color-sky: #457B9D;
+  --color-terracotta: #f3a54b;
+  --color-rust: #eb991e;
+  --color-sky: #2D6DB5;
 
   /* Texte */
-  --color-charcoal: #3B3D00;
-  --color-text: #3B3D00;
-  --color-text-muted: #6B7A2A;
-  --color-border: #D4C9B4;
-  --color-white: #FEFCF8;
-}
+  --color-charcoal: #1B2F4E;
+  --color-text: #1B2F4E;
+  --color-text-muted: #4A6080;
+  --color-border: #ffffff;
+  --color-white: #ffffff;
+
+  --font-display: 'Lusitana', Georgia, serif;
+  --font-body: 'Lusitana', Georgia, serif;
+  --font-ui: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Courier New', monospace;
+
+}/* refresh */
