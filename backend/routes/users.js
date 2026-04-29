@@ -41,13 +41,14 @@ router.get('/:id', async (req, res) => {
 });
 
 router.put('/me', auth, async (req, res) => {
-  const { name, organisation, organisation_type, bio, city, latitude, longitude } = req.body;
+  const { name, organisation, organisation_type, bio, city, latitude, longitude, website } = req.body;
   try {
     const payload = {};
     if (name) payload.name = name;
     if (organisation) payload.organisation = organisation;
     if (organisation_type) payload.organisation_type = organisation_type;
     if (bio !== undefined) payload.bio = bio;
+    if (website !== undefined) payload.website = website;
     if (city) payload.city = city;
     if (latitude) payload.latitude = latitude;
     if (longitude) payload.longitude = longitude;

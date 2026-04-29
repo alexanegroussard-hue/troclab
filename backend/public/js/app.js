@@ -930,9 +930,13 @@ function renderDashProfile(el, user) {
         <label class="form-label">Nom complet</label>
         <input class="form-input w-full" id="p-name" value="${escapeHtml(user.name)}">
       </div>
-      <div class="form-group mb-md">
+     <div class="form-group mb-md">
         <label class="form-label">Structure</label>
         <input class="form-input w-full" id="p-org" value="${escapeHtml(user.organisation)}">
+      </div>
+      <div class="form-group mb-md">
+        <label class="form-label">Site web</label>
+        <input class="form-input w-full" id="p-website" placeholder="https://monfablab.org" value="${escapeHtml(user.website||'')}">
       </div>
       <div class="form-group mb-md">
         <label class="form-label">Type de structure</label>
@@ -962,6 +966,7 @@ async function saveProfile() {
     organisation_type: document.getElementById('p-orgtype')?.value,
     city: document.getElementById('p-city')?.value.trim(),
     bio: document.getElementById('p-bio')?.value.trim(),
+    website: document.getElementById('p-website')?.value.trim(),
   };
   try {
     const updated = await Users.updateMe(payload);
@@ -999,6 +1004,7 @@ async function renderProfil(app, params) {
               <p class="font-ui text-small text-muted">${orgTypeLabel(data.organisation_type)}</p>
               <p style="font-weight:600;margin-top:4px">${escapeHtml(data.organisation)}</p>
               <p class="text-small text-muted font-ui mt-sm">📍 ${escapeHtml(data.city||'')}</p>
+              ${data.website ? `<a href="${escapeHtml(data.website)}" target="_blank" class="font-ui text-small" style="color:var(--color-forest);display:block;margin-top:4px">🔗 ${escapeHtml(data.website.replace('https://','').replace('http://',''))}</a>` : ''}
               <div class="divider"></div>
               <div class="flex justify-between font-ui text-small">
                 <span>Hôte</span><strong>${data.formations_as_host}</strong>
