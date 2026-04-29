@@ -31,4 +31,53 @@ async function sendMessageNotification({ toEmail, toName, fromName, fromOrg, mes
   }
 }
 
-module.exports = { sendMessageNotification };
+
+async function sendAdminNotification({ type, name, organisation, email, title }) {
+  if (!process.env.RESEND_API_KEY) return;
+  const isUser = type === 'user';
+  try {
+    await resend.emails.send({
+      from: 'TrocLab <onboarding@resend.dev>',
+      to: 'alexane.groussard@gmail.com',
+      subject: isUser ? `🧑 Nouvel utilisateur : ${name}` : `📚 Nouvelle formation : ${title}`,
+      html: `
+        <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+          <h2 style="color:#1B3A6B">${isUser ? '🧑 Nouvel utilisateur' : '📚 Nouvelle formation'}</h2>
+          ${isUser ? `
+            <p><strong>Nom :</strong> ${name}</p>
+            <p><strong>Structure :</strong> ${organisation}</p>
+            <p><strong>Email :</strong> ${email}</p>
+          ` : `
+            <p><strong>Formation :</strong> ${title}</p>
+            <p><strong>Structure :</strong> ${organisation}</p>
+          `}
+          <a href="https://troclab-1.onrender.com/tableau-de-bord" 
+             style="background:#E87722;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:16px">
+            Voir sur TrocLab
+          </a>
+        </div>
+      `
+    });
+  } catch (err) {
+    console.error('Resend admin error:', err.message);
+  }
+}
+
+module.exports = { sendMessageNotification, sendAdminNotification };
+
+async function sendAdminNotification({ type, name, organisation, email, title }) {
+  if (!process.env.RESEND_API_KEY) return;
+  const isUser = type === 'user';
+  try {
+    await resend.emails.send({
+      from: 'TrocLab <onboarding@resend.dev>',
+      to: 'alexane.groussard@gmail.com',
+      subject: isUser ? `Nouvel utilisateur : ${name}` : `Nouvelle formation : ${title}`,
+      html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto"><h2 style="color:#1B3A6B">${isUser ? 'Nouvel utilisateur' : 'Nouvelle formation'}</h2>${isUser ? `<p><strong>Nom :</strong> ${name}</p><p><strong>Structure :</strong> ${organisation}</p><p><strong>Email :</strong> ${email}</p>` : `<p><strong>Formation :</strong> ${title}</p><p><strong>Structure :</strong> ${organisation}</p>`}<a href="https://troclab-1.onrender.com/tableau-de-bord" style="background:#E87722;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:16px">Voir sur TrocLab</a></div>`
+    });
+  } catch (err) {
+    console.error('Resend admin error:', err.message);
+  }
+}
+
+module.exports = { sendMessageNotification, sendAdminNotification };

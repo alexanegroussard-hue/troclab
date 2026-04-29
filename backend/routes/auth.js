@@ -10,6 +10,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const { get, insert } = require('../db');
+const { sendAdminNotification } = require('../resend');
 const { auth, JWT_SECRET } = require('../middleware/auth');
 
 const router = express.Router();
@@ -46,6 +47,7 @@ router.post('/register', async (req, res) => {
 
     const token = jwt.sign({ id, email, name, is_admin: user.is_admin }, JWT_SECRET, { expiresIn: '7d' });
     const { password: _, ...safeUser } = user;
+    sendAdminNotification({ type: 'user', name, organisation, email });
     res.status(201).json({ token, user: safeUser });
 
   } catch (err) {

@@ -1,5 +1,6 @@
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
+const { sendAdminNotification } = require('../resend');
 const { get, all, insert, update, supabase } = require('../db');
 const { auth } = require('../middleware/auth');
 
@@ -80,6 +81,7 @@ router.post('/', auth, async (req, res) => {
       status: 'active'
     });
 
+    sendAdminNotification({ type: 'formation', title, organisation: user.organisation });
     res.status(201).json(formation);
   } catch (err) {
     res.status(500).json({ error: err.message });
