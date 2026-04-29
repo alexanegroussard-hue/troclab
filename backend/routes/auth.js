@@ -44,7 +44,7 @@ router.post('/register', async (req, res) => {
       avatar_color
     });
 
-    const token = jwt.sign({ id, email, name }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id, email, name, is_admin: user.is_admin }, JWT_SECRET, { expiresIn: '7d' });
     const { password: _, ...safeUser } = user;
     res.status(201).json({ token, user: safeUser });
 

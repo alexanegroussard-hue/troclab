@@ -729,6 +729,7 @@ async function renderDashboard(app) {
           <button class="filter-chip" data-tab="formations">Mes formations</button>
           <button class="filter-chip" data-tab="exchanges">Mes échanges</button>
           <button class="filter-chip" data-tab="alerts">Mes alertes</button>
+          <button class="filter-chip" data-tab="admin">Modération</button>
           <button class="filter-chip" data-tab="profile">Mon profil</button>
         </div>
 
@@ -759,6 +760,7 @@ async function renderDashboard(app) {
     else if (tab === 'formations') renderDashFormations(content, formations, freshUser);
     else if (tab === 'exchanges') renderDashExchanges(content, exchanges, freshUser);
     else if (tab === 'alerts') renderDashAlerts(content);
+    else if (tab === 'admin') renderDashAdmin(content);
     else if (tab === 'profile') renderDashProfile(content, freshUser);
   }
 
@@ -1660,4 +1662,65 @@ async function renderFormation(app) {
   } catch {
     document.getElementById('formation-detail').innerHTML = `<div class="empty-state"><h3>Formation introuvable</h3></div>`;
   }
+}
+
+async function renderDashAdmin(el) {
+  const user = Session.getUser();
+  if (!user?.is_admin) {
+    el.innerHTML = `<div class="empty-state"><h3>Accès refusé</h3></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="spinner"></div>`;
+  try {
+    const token = localStorage.getItem('troclab_token');
+    const [formations, users] = await Promise.all([
+      fetch('/api/formations?all=true', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
+      fetch('/api/users', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()),
+    ]);
+    el.innerHTML = `
+      <h3 style="margin-bottom:var(--space-lg)">Modération</h3>
+      <h4 style="margin-bottom:var(--space-md)">Formations (${formations.length})</h4>
+      <div style="display:flex;flex-direction:column;gap:var(--space-sm);margin-bottom:var(--space-xl)">
+        ${formations.map(f => `
+          <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);flex-wrap:wrap;padding:var(--space-md)">
+            <div>
+              <div class="font-ui text-small" style="font-weight:600">${escapeHtml(f.title)}</div>
+              <div class="font-ui text-small text-muted">${escapeHtml(f.organisation||'')} — ${escapeHtml(f.category)} — ${f.status}</div>
+            </div>
+            <button onclick="adminDeleteFormation('${f.id}')" class="btn btn--danger btn--sm">Supprimer</button>
+          </div>
+        `).join('')}
+      </div>
+      <h4 style="margin-bottom:var(--space-md)">Utilisateurs (${users.length})</h4>
+      <div style="display:flex;flex-direction:column;gap:var(--space-sm)">
+        ${users.map(u => `
+          <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);flex-wrap:wrap;padding:var(--space-md)">
+            <div>
+              <div class="font-ui text-small" style="font-weight:600">${escapeHtml(u.name)}</div>
+              <div class="font-ui text-small text-muted">${escapeHtml(u.organisation||'')} — ${escapeHtml(u.email||'')}</div>
+            </div>
+            <button onclick="adminDeleteUser('${u.id}')" class="btn btn--danger btn--sm">Supprimer</button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } catch (err) {
+    el.innerHTML = `<div class="empty-state"><h3>Erreur : ${err.message}</h3></div>`;
+  }
+}
+
+async function adminDeleteFormation(id) {
+  if (!confirm('Supprimer cette formation ?')) return;
+  const token = localStorage.getItem('troclab_token');
+  await fetch(`/api/formations/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+  Toast.success('Formation supprimée');
+  document.querySelector('[data-tab="admin"]').click();
+}
+
+async function adminDeleteUser(id) {
+  if (!confirm('Supprimer cet utilisateur ?')) return;
+  const token = localStorage.getItem('troclab_token');
+  await fetch(`/api/users/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+  Toast.success('Utilisateur supprimé');
+  document.querySelector('[data-tab="admin"]').click();
 }
