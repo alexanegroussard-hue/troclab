@@ -1094,7 +1094,7 @@ async function renderMessages(app) {
       convMap[otherId].messages.push(m);
       if (!m.read && m.recipient_id === currentUserId) convMap[otherId].unread++;
     });
-    Object.values(convMap).forEach(c => c.messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+    Object.values(convMap).forEach(c => c.messages.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
     return Object.values(convMap).sort((a, b) => {
       const aLast = a.messages[a.messages.length - 1].created_at;
       const bLast = b.messages[b.messages.length - 1].created_at;
