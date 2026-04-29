@@ -233,7 +233,7 @@ async function renderHome(app) {
           </div>
           <a href="/catalogue" class="btn btn--secondary">Voir tout →</a>
         </div>
-        <div class="grid grid--3" id="featured-formations">
+        <div class="grid grid--2" id="featured-formations">
           ${[1,2,3].map(() => `<div class="card" style="height:180px;background:var(--color-sand);animation:none"></div>`).join('')}
         </div>
       </div>
@@ -315,7 +315,7 @@ async function renderCatalogue(app) {
           <button class="filter-chip active" data-cat="">Toutes catégories</button>
         </div>
 
-        <div class="grid grid--3" id="formations-grid">
+        <div class="grid grid--2" id="formations-grid">
           <div class="empty-state" style="grid-column:1/-1"><div class="spinner"></div></div>
         </div>
       </div>
@@ -1509,7 +1509,7 @@ async function renderAlertes(app) {
           <div class="empty-state"><div class="spinner"></div></div>
         </div>
         <h3 style="margin-bottom:var(--space-md)">Formations correspondantes</h3>
-        <div id="alerts-matches" class="grid grid--3">
+        <div id="alerts-matches" class="grid grid--2">
           <div class="empty-state" style="grid-column:1/-1"><div class="spinner"></div></div>
         </div>
       </div>
@@ -1609,7 +1609,7 @@ async function renderDashAlerts(el) {
       <div class="empty-state"><div class="spinner"></div></div>
     </div>
     <h3 style="margin-bottom:var(--space-md)">Formations correspondantes</h3>
-    <div id="alerts-matches" class="grid grid--3">
+    <div id="alerts-matches" class="grid grid--2">
       <div class="empty-state" style="grid-column:1/-1"><div class="spinner"></div></div>
     </div>
   `;
