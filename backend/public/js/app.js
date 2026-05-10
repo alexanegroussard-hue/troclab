@@ -252,11 +252,13 @@ async function renderHome(app) {
         </a>
       </div>
     </section>
-    <section style="background:var(--color-background-secondary);border-top:1px solid var(--color-border-tertiary);padding:var(--space-xl) 0">
-      <div class="container container--narrow">
-        <h2 style="margin-bottom:var(--space-md);font-size:1.2rem">Transparence &amp; IA</h2>
-        <p style="color:var(--color-text-secondary);line-height:1.8">Nous tenons à être transparents : ce projet, développé par une étudiante en Master, a été conçu avec l'aide d'outils d'IA. Le maintien et la sécurité de la plateforme reposent également sur ces outils. Une fois le projet stabilisé et doté des ressources nécessaires, ces outils seront remplacés par une équipe humaine salariée. En attendant, l'IA nous permet de faire avancer ce projet tout en restant fidèles à nos idéaux éthiques et de transparence.</p>
-        <p style="margin-top:var(--space-md);font-weight:600;color:var(--color-forest)">Objectif pour humaniser le projet : <span style="font-family:var(--font-display);font-size:1.3rem">100 structures adhérentes</span></p>
+    <section style="padding:var(--space-xl) 0;background:var(--color-background-primary)">
+      <div class="container">
+        <div style="background:#e8f5e9;border:1.5px solid #81c784;border-radius:16px;padding:var(--space-xl) var(--space-xl);max-width:860px;margin:0 auto">
+          <h2 style="margin-bottom:var(--space-md);font-size:1.2rem;color:#2d6d39">Transparence &amp; IA</h2>
+          <p style="color:#2d4a2f;line-height:1.9;font-size:1rem">Nous tenons à être transparents : ce projet, développé par une étudiante en Master, a été conçu avec l'aide d'outils d'IA. Le maintien et la sécurité de la plateforme reposent également sur ces outils. Une fois le projet stabilisé et doté des ressources nécessaires, ces outils seront remplacés par une équipe humaine salariée. En attendant, l'IA nous permet de faire avancer ce projet tout en restant fidèles à nos idéaux éthiques et de transparence.</p>
+          <p style="margin-top:var(--space-md);font-weight:600;color:#2d6d39">Objectif pour humaniser le projet : <span style="font-family:var(--font-display);font-size:1.3rem">100 structures adhérentes</span></p>
+        </div>
       </div>
     </section>
     ` : ''}
@@ -540,11 +542,13 @@ function renderAbout(app) {
         collectivités soutenant l'ESS et l'éducation populaire. Chaque année, un bilan financier transparent
         est publié sur cette page.</p>
 
-    <section style="background:var(--color-background-secondary);border-top:1px solid var(--color-border-tertiary);padding:var(--space-xl) 0">
-      <div class="container container--narrow">
-        <h2 style="margin-bottom:var(--space-md);font-size:1.2rem">Transparence &amp; IA</h2>
-        <p style="color:var(--color-text-secondary);line-height:1.8">Nous tenons à être transparents : ce projet, développé par une étudiante en Master, a été conçu avec l'aide d'outils d'IA. Le maintien et la sécurité de la plateforme reposent également sur ces outils. Une fois le projet stabilisé et doté des ressources nécessaires, ces outils seront remplacés par une équipe humaine salariée. En attendant, l'IA nous permet de faire avancer ce projet tout en restant fidèles à nos idéaux éthiques et de transparence.</p>
-        <p style="margin-top:var(--space-md);font-weight:600;color:var(--color-forest)">Objectif pour humaniser le projet : <span style="font-family:var(--font-display);font-size:1.3rem">100 structures adhérentes</span></p>
+    <section style="padding:var(--space-xl) 0;background:var(--color-background-primary)">
+      <div class="container">
+        <div style="background:#e8f5e9;border:1.5px solid #81c784;border-radius:16px;padding:var(--space-xl) var(--space-xl);max-width:860px;margin:0 auto">
+          <h2 style="margin-bottom:var(--space-md);font-size:1.2rem;color:#2d6d39">Transparence &amp; IA</h2>
+          <p style="color:#2d4a2f;line-height:1.9;font-size:1rem">Nous tenons à être transparents : ce projet, développé par une étudiante en Master, a été conçu avec l'aide d'outils d'IA. Le maintien et la sécurité de la plateforme reposent également sur ces outils. Une fois le projet stabilisé et doté des ressources nécessaires, ces outils seront remplacés par une équipe humaine salariée. En attendant, l'IA nous permet de faire avancer ce projet tout en restant fidèles à nos idéaux éthiques et de transparence.</p>
+          <p style="margin-top:var(--space-md);font-weight:600;color:#2d6d39">Objectif pour humaniser le projet : <span style="font-family:var(--font-display);font-size:1.3rem">100 structures adhérentes</span></p>
+        </div>
       </div>
     </section>
         <div class="divider"></div>
