@@ -734,11 +734,15 @@ async function renderDashboard(app) {
     <div class="section">
       <div class="container">
         <div class="section__header flex justify-between items-center" style="flex-wrap:wrap;gap:var(--space-md)">
-          <div>
-            <div class="section__eyebrow">Mon espace</div>
-            <h2>Bonjour, ${escapeHtml(user.name)} 👋</h2>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%">
+            <div>
+              <div style="display:flex;align-items:center;gap:var(--space-md)">
+                <div class="section__eyebrow">Mon espace</div>
+                <button onclick="Auth.logout()" class="btn btn--ghost btn--sm" style="font-size:0.8rem;padding:2px 10px">Se déconnecter</button>
+              </div>
+              <h2>Bonjour, ${escapeHtml(user.name)} 👋</h2>
+            </div>
           </div>
-          <button onclick="Auth.logout()" class="btn btn--ghost btn--sm">Se déconnecter</button>
         </div>
 
         <!-- Tabs -->
