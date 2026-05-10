@@ -864,7 +864,7 @@ function renderDashOverview(el, user, formations, exchanges) {
         <!-- Échanges récents -->
         <h3 style="margin-bottom:var(--space-md)">Échanges récents</h3>
         ${exchanges.length === 0
-          ? `<div class="empty-state card"><div class="empty-state__icon">🤝</div><h3>Pas encore d'échange</h3><p>Parcourez le <a href="/catalogue" style="color:var(--color-forest)">catalogue</a> pour demander votre première formation.<br>ou <a onclick="openNewFormationModal()" style="color:var(--color-saffron);cursor:pointer;font-weight:500">ajouter</a> votre propre formation dès maintenant.</p></div>`
+          ? `<div class="empty-state card"><div class="empty-state__icon">🤝</div><h3>Pas encore d'échange</h3><p>Parcourez le <a href="/catalogue" style="color:var(--color-forest)">catalogue</a> pour demander votre première formation.<br>ou <a onclick="openNewFormationModal()" style="color:var(--color-terracotta);cursor:pointer;font-weight:500">ajouter</a> votre propre formation dès maintenant.</p></div>`
           : exchanges.slice(0, 5).map(ex => `
               <div class="card mb-md" style="display:flex;align-items:center;gap:var(--space-md);flex-wrap:wrap">
                 <div style="flex:1;min-width:200px">
@@ -894,7 +894,7 @@ function renderDashFormations(el, formations, user) {
   el.innerHTML = `
     <div class="flex justify-between items-center mb-lg" style="flex-wrap:wrap;gap:var(--space-md)">
       <h3>Mes formations (${formations.filter(f=>f.status!=='archived').length})</h3>
-      <a onclick="openNewFormationModal()" style="color:var(--color-saffron);cursor:pointer;font-weight:500;font-size:0.9rem">+ Ajouter une formation</a>
+      <a onclick="openNewFormationModal()" style="color:var(--color-terracotta);cursor:pointer;font-weight:500;font-size:0.9rem">+ Ajouter une formation</a>
     </div>
     ${formations.filter(f => f.status !== 'archived').length === 0
       ? `<div class="empty-state card"><div class="empty-state__icon">📚</div><h3>Aucune formation</h3><p>Ajoutez vos premières formations pour rejoindre le réseau.</p></div>`
