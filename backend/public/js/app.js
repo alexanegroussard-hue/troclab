@@ -252,6 +252,13 @@ async function renderHome(app) {
         </a>
       </div>
     </section>
+    <section style="background:var(--color-background-secondary);border-top:1px solid var(--color-border-tertiary);padding:var(--space-xl) 0">
+      <div class="container container--narrow">
+        <h2 style="margin-bottom:var(--space-md);font-size:1.2rem">Transparence &amp; IA</h2>
+        <p style="color:var(--color-text-secondary);line-height:1.8">Nous tenons à être transparents : ce projet, développé par une étudiante en Master, a été conçu avec l'aide d'outils d'IA. Le maintien et la sécurité de la plateforme reposent également sur ces outils. Une fois le projet stabilisé et doté des ressources nécessaires, ces outils seront remplacés par une équipe humaine salariée. En attendant, l'IA nous permet de faire avancer ce projet tout en restant fidèles à nos idéaux éthiques et de transparence.</p>
+        <p style="margin-top:var(--space-md);font-weight:600;color:var(--color-forest)">Objectif pour humaniser le projet : <span style="font-family:var(--font-display);font-size:1.3rem">100 structures adhérentes</span></p>
+      </div>
+    </section>
     ` : ''}
   `;
 
@@ -517,7 +524,7 @@ function renderAbout(app) {
           </div>
           <div class="card" style="border-color:var(--color-forest)">
             <h4>Abonnement annuel</h4>
-            <p style="font-family:var(--font-display);font-size:1.8rem;color:var(--color-forest);margin:8px 0">30 €<span style="font-size:1rem;color:var(--color-text-muted);font-family:var(--font-ui)">/an</span></p>
+            <p style="font-family:var(--font-display);font-size:1.8rem;color:var(--color-forest);margin:8px 0">50 €<span style="font-size:1rem;color:var(--color-text-muted);font-family:var(--font-ui)">/an — soit 4,17€/mois</span></p>
             <p class="text-small text-muted">Formations illimitées, accès à tous les outils, soutien au projet.</p>
           </div>
         </div>
@@ -533,6 +540,13 @@ function renderAbout(app) {
         collectivités soutenant l'ESS et l'éducation populaire. Chaque année, un bilan financier transparent
         est publié sur cette page.</p>
 
+    <section style="background:var(--color-background-secondary);border-top:1px solid var(--color-border-tertiary);padding:var(--space-xl) 0">
+      <div class="container container--narrow">
+        <h2 style="margin-bottom:var(--space-md);font-size:1.2rem">Transparence &amp; IA</h2>
+        <p style="color:var(--color-text-secondary);line-height:1.8">Nous tenons à être transparents : ce projet, développé par une étudiante en Master, a été conçu avec l'aide d'outils d'IA. Le maintien et la sécurité de la plateforme reposent également sur ces outils. Une fois le projet stabilisé et doté des ressources nécessaires, ces outils seront remplacés par une équipe humaine salariée. En attendant, l'IA nous permet de faire avancer ce projet tout en restant fidèles à nos idéaux éthiques et de transparence.</p>
+        <p style="margin-top:var(--space-md);font-weight:600;color:var(--color-forest)">Objectif pour humaniser le projet : <span style="font-family:var(--font-display);font-size:1.3rem">100 structures adhérentes</span></p>
+      </div>
+    </section>
         <div class="divider"></div>
 
         <h2 id="mentions" style="margin-bottom:var(--space-md)">Mentions légales</h2>
@@ -832,7 +846,7 @@ function renderDashOverview(el, user, formations, exchanges) {
                <div style="background:var(--color-sand);border-radius:8px;height:8px;margin-bottom:var(--space-md)">
                  <div style="background:var(--color-forest);border-radius:8px;height:8px;width:${(formations.length/2)*100}%"></div>
                </div>
-               <button onclick="openUpgradeModal()" class="btn btn--primary w-full btn--sm">Passer à Premium — 30€/an</button>`
+               <button onclick="openUpgradeModal()" class="btn btn--primary w-full btn--sm">Passer à Premium — 50€/an</button>`
           }
         </div>
       </div>
@@ -1484,7 +1498,7 @@ function openUpgradeModal() {
     <div class="text-center mb-lg">
       <div style="font-size:2.5rem;margin-bottom:var(--space-md)">🌿</div>
       <h3>Abonnement annuel TrocLab</h3>
-      <div style="font-family:var(--font-display);font-size:3rem;color:var(--color-forest);margin:var(--space-md) 0">30€<span style="font-size:1rem;color:var(--color-text-muted);font-family:var(--font-ui)">/an</span></div>
+      <div style="font-family:var(--font-display);font-size:3rem;color:var(--color-forest);margin:var(--space-md) 0">50€<span style="font-size:1rem;color:var(--color-text-muted);font-family:var(--font-ui)">/an — soit 4,17€/mois</span></div>
     </div>
     <div class="pricing-feature">Formations illimitées</div>
     <div class="pricing-feature">Messagerie interne complète</div>
