@@ -88,13 +88,13 @@ function renderNav() {
 
   if (user) {
     nav.innerHTML = `
+      <a href="/about" class="nav-link">À propos</a>
       <a href="/catalogue" class="nav-link">Formations</a>
       <a href="/carte" class="nav-link">Carte</a>
       <a href="/messages" class="nav-link">
         Messages <span class="navbar__badge hidden" id="msg-badge">0</span>
       </a>
       <a href="/tableau-de-bord" class="nav-link">Mon espace</a>
-      <button onclick="Auth.logout()" class="btn btn--ghost btn--sm">Déconnexion</button>
     `;
     if (footerLogin) footerLogin.classList.add('hidden');
     if (footerDash) footerDash.classList.remove('hidden');
@@ -738,7 +738,7 @@ async function renderDashboard(app) {
             <div class="section__eyebrow">Mon espace</div>
             <h2>Bonjour, ${escapeHtml(user.name)} 👋</h2>
           </div>
-          <button onclick="openNewFormationModal()" class="btn btn--primary">+ Ajouter une formation</button>
+          <p style="font-size:0.95rem;color:var(--color-text-secondary)">Parcourez le <a href="/catalogue" style="color:var(--color-forest)">catalogue</a> pour demander votre première formation.<br>ou <a onclick="openNewFormationModal()" style="color:var(--color-saffron);cursor:pointer;font-weight:500">ajouter</a> votre propre formation dès maintenant.</p>
         </div>
 
         <!-- Tabs -->
@@ -890,7 +890,7 @@ function renderDashFormations(el, formations, user) {
   el.innerHTML = `
     <div class="flex justify-between items-center mb-lg" style="flex-wrap:wrap;gap:var(--space-md)">
       <h3>Mes formations (${formations.filter(f=>f.status!=='archived').length})</h3>
-      <button onclick="openNewFormationModal()" class="btn btn--primary btn--sm">+ Nouvelle formation</button>
+      <a onclick="openNewFormationModal()" style="color:var(--color-saffron);cursor:pointer;font-weight:500;font-size:0.9rem">+ Ajouter une formation</a>
     </div>
     ${formations.filter(f => f.status !== 'archived').length === 0
       ? `<div class="empty-state card"><div class="empty-state__icon">📚</div><h3>Aucune formation</h3><p>Ajoutez vos premières formations pour rejoindre le réseau.</p></div>`
