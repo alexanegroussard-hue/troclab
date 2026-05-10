@@ -738,7 +738,7 @@ async function renderDashboard(app) {
             <div class="section__eyebrow">Mon espace</div>
             <h2>Bonjour, ${escapeHtml(user.name)} 👋</h2>
           </div>
-          <p style="font-size:0.95rem;color:var(--color-text-secondary)">Parcourez le <a href="/catalogue" style="color:var(--color-forest)">catalogue</a> pour demander votre première formation.<br>ou <a onclick="openNewFormationModal()" style="color:var(--color-saffron);cursor:pointer;font-weight:500">ajouter</a> votre propre formation dès maintenant.</p>
+          <button onclick="Auth.logout()" class="btn btn--ghost btn--sm">Se déconnecter</button>
         </div>
 
         <!-- Tabs -->
@@ -860,7 +860,7 @@ function renderDashOverview(el, user, formations, exchanges) {
         <!-- Échanges récents -->
         <h3 style="margin-bottom:var(--space-md)">Échanges récents</h3>
         ${exchanges.length === 0
-          ? `<div class="empty-state card"><div class="empty-state__icon">🤝</div><h3>Pas encore d'échange</h3><p>Parcourez le <a href="/catalogue" style="color:var(--color-forest)">catalogue</a> pour demander votre première formation.</p></div>`
+          ? `<div class="empty-state card"><div class="empty-state__icon">🤝</div><h3>Pas encore d'échange</h3><p>Parcourez le <a href="/catalogue" style="color:var(--color-forest)">catalogue</a> pour demander votre première formation.<br>ou <a onclick="openNewFormationModal()" style="color:var(--color-saffron);cursor:pointer;font-weight:500">ajouter</a> votre propre formation dès maintenant.</p></div>`
           : exchanges.slice(0, 5).map(ex => `
               <div class="card mb-md" style="display:flex;align-items:center;gap:var(--space-md);flex-wrap:wrap">
                 <div style="flex:1;min-width:200px">
