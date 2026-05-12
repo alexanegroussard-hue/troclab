@@ -834,8 +834,8 @@ function renderDashOverview(el, user, formations, exchanges) {
         <div class="sidebar-card" style="margin-bottom:var(--space-lg)">
           <h4 style="margin-bottom:var(--space-md)">⚖️ Équilibre</h4>
           <div class="flex justify-between font-ui text-small mb-sm">
-            <span>Hôte (${host})</span>
-            <span>Voyageur (${traveler})</span>
+            <span>Formateur (${host})</span>
+            <span>Participant (${traveler})</span>
           </div>
           <div class="balance-bar"><div class="balance-bar__fill" style="width:${balancePct}%"></div></div>
           ${imbalance > 4
@@ -1037,10 +1037,10 @@ async function renderProfil(app, params) {
               ${data.website ? `<a href="${escapeHtml(data.website)}" target="_blank" class="font-ui text-small" style="color:var(--color-forest);display:block;margin-top:4px">🔗 ${escapeHtml(data.website.replace('https://','').replace('http://',''))}</a>` : ''}
               <div class="divider"></div>
               <div class="flex justify-between font-ui text-small">
-                <span>Hôte</span><strong>${data.formations_as_host}</strong>
+                <span>Formateur</span><strong>${data.formations_as_host}</strong>
               </div>
               <div class="flex justify-between font-ui text-small mt-sm">
-                <span>Voyageur</span><strong>${data.formations_as_traveler}</strong>
+                <span>Participant</span><strong>${data.formations_as_traveler}</strong>
               </div>
               ${currentUser && currentUser.id !== data.id ? `
                 <button onclick="openMessageCompose('${data.id}','${escapeHtml(data.name)}')"
