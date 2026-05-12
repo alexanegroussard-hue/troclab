@@ -305,8 +305,8 @@ async function renderCatalogue(app) {
         <div class="section__header">
           <div class="section__eyebrow">Toutes les formations</div>
           <h2>Catalogue</h2>
-          <p class="text-muted font-ui" style="margin-top:var(--space-sm);max-width:600px"><strong>Trouvez la formation qu'il vous faut.</strong> Utilisez les filtres par type, catégorie ou mot-clé pour affiner votre recherche. Une fois la formation repérée, contactez directement la structure via la messagerie intégrée.<br> 
-          Vous pouvez aussi parcourir les formations et ateliers payants qui sont proposés sur Troclab a but unique de diffusion, cra nous comprenons que pour certaines structures, les formations soient un apport majeur d'un point de vue économique.</p>
+          <p class="text-muted font-ui" style="margin-top:var(--space-sm);max-width:600px"><strong>Trouvez la formation qu'il vous faut.</strong> Utilisez les filtres par type, catégorie ou mot-clé pour affiner votre recherche. Une fois la formation repérée, contactez directement la structure via la messagerie intégrée".<br> 
+          Parce que former a un coût, certaines structures proposent aussi des ateliers et formations marchandes — retrouvez-les juste en-dessous.</p>
         </div>
 
         <!-- Barre de filtres -->
