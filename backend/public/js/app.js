@@ -11,7 +11,6 @@ const routes = {
   '/catalogue':         renderCatalogue,
   '/carte':             renderCarte,
   '/about':             renderAbout,
-  '/diffusion':         renderDiffusion,
   '/connexion':         renderLogin,
   '/inscription':       renderRegister,
   '/tableau-de-bord':   renderDashboard,
@@ -306,8 +305,8 @@ async function renderCatalogue(app) {
         <div class="section__header">
           <div class="section__eyebrow">Toutes les formations</div>
           <h2>Catalogue</h2>
-          <p class="text-muted font-ui" style="margin-top:var(--space-sm);max-width:600px"><strong>Trouvez la formation qu'il vous faut.</strong> Utilisez les filtres par type, catégorie ou mot-clé pour affiner votre recherche. Une fois la formation repérée, contactez directement la structure via la messagerie intégrée.</p>
-          <p style="margin-top:var(--space-sm);font-size:0.85rem"><a href="/diffusion" style="color:var(--color-text-muted);text-decoration:underline">Diffusion des ateliers et formations marchandes →</a></p>
+          <p class="text-muted font-ui" style="margin-top:var(--space-sm);max-width:600px"><strong>Trouvez la formation qu'il vous faut.</strong> Utilisez les filtres par type, catégorie ou mot-clé pour affiner votre recherche. Une fois la formation repérée, contactez directement la structure via la messagerie intégrée.<br> 
+          Vous pouvez aussi parcourir les formations et ateliers payants qui sont proposés sur Troclab a but unique de diffusion, cra nous comprenons que pour certaines structures, les formations soient un apport majeur d'un point de vue économique.</p>
         </div>
 
         <!-- Barre de filtres -->
@@ -475,25 +474,6 @@ async function renderCarte(app) {
 // =============================================
 // PAGE : À PROPOS
 // =============================================
-function renderDiffusion(app) {
-  app.innerHTML = `
-    <div class="section">
-      <div class="container container--narrow">
-        <div class="section__header">
-          <div class="section__eyebrow">Hors troc</div>
-          <h2>Diffusion des ateliers et formations marchandes</h2>
-          <p class="text-muted font-ui" style="margin-top:var(--space-sm)">Cet espace permet aux structures adhérentes de diffuser leurs formations payantes et ateliers professionnels. Il ne s'agit pas de troc — ces offres sont proposées à titre commercial par leurs organisateurs.</p>
-        </div>
-        <div class="card" style="padding:var(--space-xl);text-align:center;color:var(--color-text-muted)">
-          <div style="font-size:2rem;margin-bottom:var(--space-md)">📋</div>
-          <p>Aucune annonce pour le moment.<br>Les structures abonnées peuvent contacter <a href="mailto:alexane.groussard@gmail.com" style="color:var(--color-forest)">alexane.groussard@gmail.com</a> pour diffuser une offre.</p>
-        </div>
-        <p style="margin-top:var(--space-lg);font-size:0.85rem;text-align:center"><a href="/catalogue" style="color:var(--color-text-muted);text-decoration:underline">← Retour au catalogue</a></p>
-      </div>
-    </div>
-  `;
-}
-
 function renderAbout(app) {
   app.innerHTML = `
     <section class="hero" style="padding:var(--space-xl) 0">
@@ -840,11 +820,11 @@ function renderDashOverview(el, user, formations, exchanges) {
       </div>
       <div class="stat-card">
         <div class="stat-card__value">${traveler}</div>
-        <div class="stat-card__label">Fois voyageur</div>
+        <div class="stat-card__label">Fois participant</div>
       </div>
       <div class="stat-card">
         <div class="stat-card__value">${host}</div>
-        <div class="stat-card__label">Fois hôte</div>
+        <div class="stat-card__label">Fois formateur</div>
       </div>
     </div>
 
@@ -1427,7 +1407,7 @@ function openExchangeRequest(formationId, hostId, title) {
   if (!Session.isLoggedIn()) { navigate('/connexion'); return; }
   Modal.show(`Demander "${escapeHtml(title)}"`, `
     <div id="exch-error"></div>
-    <p class="font-ui text-small text-muted mb-md">Envoyez une demande d'échange. L'hôte sera notifié et pourra accepter ou refuser.</p>
+    <p class="font-ui text-small text-muted mb-md">Envoyez une demande d'échange. Le formateur sera notifié et pourra accepter ou refuser.</p>
     <div class="form-group mb-md">
       <label class="form-label">Date souhaitée (optionnel)</label>
       <input class="form-input w-full" type="date" id="ex-date">
