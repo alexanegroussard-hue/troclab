@@ -307,6 +307,7 @@ async function renderCatalogue(app) {
           <h2>Catalogue</h2>
           <p class="text-muted font-ui" style="margin-top:var(--space-sm);max-width:600px"><strong>Trouvez la formation qu'il vous faut.</strong> Utilisez les filtres par type, catégorie ou mot-clé pour affiner votre recherche. Une fois la formation repérée, contactez directement la structure via la messagerie intégrée".<br> 
           Parce que former a un coût, certaines structures proposent aussi des ateliers et formations marchandes — retrouvez-les juste en-dessous.</p>
+          <p style="margin-top:var(--space-sm);font-size:0.85rem"><a href="/diffusion" style="color:var(--color-text-muted);text-decoration:underline">Diffusion des ateliers et formations marchandes &rarr;</a></p>
         </div>
 
         <!-- Barre de filtres -->
