@@ -491,7 +491,7 @@ function renderDiffusion(app) {
         <p style="margin-top:var(--space-lg);font-size:0.85rem;text-align:center"><a href="/catalogue" style="color:var(--color-text-muted);text-decoration:underline">← Retour au catalogue</a></p>
       </div>
     </div>
-  \`;
+  `;
 }
 
 function renderAbout(app) {
