@@ -460,16 +460,16 @@ function renderAbout(app) {
 
         <h2 id="fonctionnement" style="margin-bottom:var(--space-md)">Comment ça marche en détail</h2>
 
-        <h4 style="margin-bottom:var(--space-sm)">Le rôle de voyageur</h4>
-        <p>En tant que <em>voyageur</em>, vous allez vous faire former dans une autre structure.
-        Vous profitez de leur expertise, de leur lieu, de leurs outils. C'est vous qui vous déplacez (ou qui vous connectez).</p>
+        <h4 style="margin-bottom:var(--space-sm)">Le rôle de participant</h4>
+        <p>En tant que <em>participant</em>, vous allez vous faire former grâce à une autre structure.
+        Vous profitez de leur expertise, possiblement de leur lieu, de leurs outils.</p>
 
-        <h4 style="margin-top:var(--space-lg);margin-bottom:var(--space-sm)">Le rôle d'hôte</h4>
-        <p>En tant qu'<em>hôte</em>, vous accueillez des bénévoles d'autres structures et vous leur
+        <h4 style="margin-top:var(--space-lg);margin-bottom:var(--space-sm)">Le rôle de formateur</h4>
+        <p>En tant qu'<em>formateur</em>, vous accueillez et allez vers des bénévoles d'autres structures et vous leur
         transmettez un savoir-faire. C'est vous qui préparez et animez la formation.</p>
 
         <h4 style="margin-top:var(--space-lg);margin-bottom:var(--space-sm)">La règle d'équilibre</h4>
-        <p>Le nombre de fois où vous avez été voyageur moins le nombre de fois où vous avez été hôte
+        <p>Le nombre de fois où vous avez été participant moins le nombre de fois où vous avez été formateur
         ne peut pas dépasser <strong>5</strong>. Ce mécanisme garantit que personne ne "consomme"
         la plateforme sans contribuer. Si vous atteignez la limite, la plateforme vous invite à
         proposer des formations avant de pouvoir en demander de nouvelles.</p>
@@ -762,11 +762,11 @@ function renderDashOverview(el, user, formations, exchanges) {
       </div>
       <div class="stat-card">
         <div class="stat-card__value">${traveler}</div>
-        <div class="stat-card__label">Fois voyageur</div>
+        <div class="stat-card__label">Fois participant</div>
       </div>
       <div class="stat-card">
         <div class="stat-card__value">${host}</div>
-        <div class="stat-card__label">Fois hôte</div>
+        <div class="stat-card__label">Fois formateur</div>
       </div>
     </div>
 
@@ -777,8 +777,8 @@ function renderDashOverview(el, user, formations, exchanges) {
         <div class="sidebar-card" style="margin-bottom:var(--space-lg)">
           <h4 style="margin-bottom:var(--space-md)">⚖️ Équilibre</h4>
           <div class="flex justify-between font-ui text-small mb-sm">
-            <span>Hôte (${host})</span>
-            <span>Voyageur (${traveler})</span>
+            <span>Formateur (${host})</span>
+            <span>Participant (${traveler})</span>
           </div>
           <div class="balance-bar"><div class="balance-bar__fill" style="width:${balancePct}%"></div></div>
           ${imbalance > 4
@@ -966,10 +966,10 @@ async function renderProfil(app, params) {
               <p class="text-small text-muted font-ui mt-sm">📍 ${escapeHtml(data.city||'')}</p>
               <div class="divider"></div>
               <div class="flex justify-between font-ui text-small">
-                <span>Hôte</span><strong>${data.formations_as_host}</strong>
+                <span>Formateur</span><strong>${data.formations_as_host}</strong>
               </div>
               <div class="flex justify-between font-ui text-small mt-sm">
-                <span>Voyageur</span><strong>${data.formations_as_traveler}</strong>
+                <span>Participant</span><strong>${data.formations_as_traveler}</strong>
               </div>
               ${currentUser && currentUser.id !== data.id ? `
                 <button onclick="openMessageCompose('${data.id}','${escapeHtml(data.name)}')"
@@ -1256,7 +1256,7 @@ function openExchangeRequest(formationId, hostId, title) {
   if (!Session.isLoggedIn()) { navigate('/connexion'); return; }
   Modal.show(`Demander "${escapeHtml(title)}"`, `
     <div id="exch-error"></div>
-    <p class="font-ui text-small text-muted mb-md">Envoyez une demande d'échange. L'hôte sera notifié et pourra accepter ou refuser.</p>
+    <p class="font-ui text-small text-muted mb-md">Envoyez une demande d'échange. Le formateur sera notifié et pourra accepter ou refuser.</p>
     <div class="form-group mb-md">
       <label class="form-label">Date souhaitée (optionnel)</label>
       <input class="form-input w-full" type="date" id="ex-date">

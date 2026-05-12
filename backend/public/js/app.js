@@ -185,9 +185,9 @@ async function renderHome(app) {
         <div class="balance-explainer">
           <div>
             <div class="section__eyebrow" style="color:var(--color-moss)">Le cœur du système</div>
-            <h2 style="color:white">L'équilibre voyageur / hôte</h2>
+            <h2 style="color:white">L'équilibre participant / formateur</h2>
             <p style="color:rgba(245,240,232,0.8);margin-top:var(--space-md);line-height:1.7">
-              Chaque membre peut être <strong>voyageur</strong> (se faire former ailleurs) et <strong>hôte</strong>
+              Chaque membre peut être <strong>participant</strong> (se faire former) et <strong>formateur</strong>
               (former des bénévoles d'autres structures). La différence entre les deux ne peut pas dépasser
               <strong>5 formations</strong>, pour garantir la réciprocité.
             </p>
@@ -197,22 +197,22 @@ async function renderHome(app) {
           </div>
           <div class="balance-visual">
             <div class="balance-row">
-              <span class="balance-pill pill--green">Voyageur ×3</span>
+              <span class="balance-pill pill--green">Participant ×3</span>
               <span style="color:rgba(245,240,232,0.6)">formations reçues</span>
             </div>
             <div class="balance-row">
-              <span class="balance-pill pill--green">Hôte ×2</span>
+              <span class="balance-pill pill--green">Formateur ×2</span>
               <span style="color:rgba(245,240,232,0.6)">formations données</span>
             </div>
             <div style="color:var(--color-moss);font-family:var(--font-ui);font-size:0.9rem;padding:8px 0">
               ✓ Différence = 1 — Équilibré
             </div>
             <div class="balance-row" style="margin-top:var(--space-md);padding-top:var(--space-md);border-top:1px solid rgba(255,255,255,0.15)">
-              <span class="balance-pill pill--orange">Voyageur ×8</span>
+              <span class="balance-pill pill--orange">Participant ×8</span>
               <span style="color:rgba(245,240,232,0.6)">formations reçues</span>
             </div>
             <div class="balance-row">
-              <span class="balance-pill pill--green">Hôte ×2</span>
+              <span class="balance-pill pill--green">Formateur ×2</span>
               <span style="color:rgba(245,240,232,0.6)">formations données</span>
             </div>
             <div style="color:var(--color-terracotta);font-family:var(--font-ui);font-size:0.9rem;padding:8px 0">
@@ -500,16 +500,16 @@ function renderAbout(app) {
 
         <h2 id="fonctionnement" style="margin-bottom:var(--space-md)">Comment ça marche en détail</h2>
 
-        <h4 style="margin-bottom:var(--space-sm)">Le rôle de voyageur</h4>
-        <p>En tant que <em>voyageur</em>, vous allez vous faire former dans une autre structure.
-        Vous profitez de leur expertise, de leur lieu, de leurs outils. C'est vous qui vous déplacez (ou qui vous connectez).</p>
+        <h4 style="margin-bottom:var(--space-sm)">Le rôle de participant</h4>
+        <p>En tant que <em>participant</em>, vous allez vous faire former grâce à une autre structure.
+        Vous profitez de leur expertise, possiblement de leur lieu, de leurs outils.</p>
 
-        <h4 style="margin-top:var(--space-lg);margin-bottom:var(--space-sm)">Le rôle d'hôte</h4>
-        <p>En tant qu'<em>hôte</em>, vous accueillez des bénévoles d'autres structures et vous leur
+        <h4 style="margin-top:var(--space-lg);margin-bottom:var(--space-sm)">Le rôle de formateur</h4>
+        <p>En tant qu'<em>formateur</em>, vous accueillez ou allez vers des bénévoles d'autres structures et vous leur
         transmettez un savoir-faire. C'est vous qui préparez et animez la formation.</p>
 
         <h4 style="margin-top:var(--space-lg);margin-bottom:var(--space-sm)">La règle d'équilibre</h4>
-        <p>Le nombre de fois où vous avez été voyageur moins le nombre de fois où vous avez été hôte
+        <p>Le nombre de fois où vous avez été participant moins le nombre de fois où vous avez été formateur
         ne peut pas dépasser <strong>5</strong>. Ce mécanisme garantit que personne ne "consomme"
         la plateforme sans contribuer. Si vous atteignez la limite, la plateforme vous invite à
         proposer des formations avant de pouvoir en demander de nouvelles.</p>
