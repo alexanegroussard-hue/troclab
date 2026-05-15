@@ -340,7 +340,7 @@ async function renderCatalogue(app) {
   let activeCategory = '';
   let searchValue = '';
 
-  try { allFormations = await Formations.list(); } catch {}
+  try { allFormations = await Formations.list({ is_paid: false }); } catch {}
 
   // Remplir catégories
   const cats = [...new Set(allFormations.map(f => f.category))];
@@ -1300,7 +1300,7 @@ async function submitNewFormation() {
     <div style="font-family:var(--font-ui);line-height:1.7">
       <p style="margin-bottom:var(--space-md)">En publiant cette formation, vous confirmez qu'elle respecte les règles de TrocLab :</p>
       <ul style="margin-bottom:var(--space-md);padding-left:var(--space-lg)">
-        <li>✅ La formation est <strong>gratuite</strong> — TrocLab repose sur le troc</li>
+        ${isPaid ? '<li>💶 La formation est <strong>payante</strong> — elle ne sera visible que sur le <a href="/diffusion">catalogue des formations marchandes</a>, pas dans le catalogue principal</li>' : '<li>✅ La formation est <strong>gratuite</strong> — TrocLab repose sur le troc</li>'}
         <li>✅ Le contenu est <strong>réel et réalisable</strong> par votre structure</li>
         <li>✅ La description est <strong>claire et honnête</strong></li>
       </ul>
