@@ -171,7 +171,7 @@ PUT  /api/messages/:id/read       Marquer lu (auth)
 
 ## Logique métier clé
 
-### Règle d'équilibre voyageur/hôte
+### Règle d'équilibre participant/formateur
 
 ```
 formations_as_traveler - formations_as_host ≤ 5

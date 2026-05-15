@@ -18,6 +18,7 @@ router.get('/', async (req, res) => {
 
     if (type) query = query.eq('type', type);
     if (category) query = query.eq('category', category);
+    if (req.query.is_paid !== undefined) query = query.eq('is_paid', req.query.is_paid === 'true');
     if (search) query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%,category.ilike.%${search}%`);
 
     const { data, error } = await query;
@@ -52,7 +53,7 @@ router.get('/mine', auth, async (req, res) => {
 
 // POST /api/formations
 router.post('/', auth, async (req, res) => {
-  const { title, description, category, duration_hours, max_participants, type } = req.body;
+  const { title, description, category, duration_hours, max_participants, type, is_paid } = req.body;
 
   if (!title || !description || !category || !type)
     return res.status(400).json({ error: 'Champs obligatoires manquants' });
@@ -78,7 +79,8 @@ router.post('/', auth, async (req, res) => {
       title, description, category, type,
       duration_hours: duration_hours || 2,
       max_participants: max_participants || 10,
-      status: 'active'
+      status: 'active',
+      is_paid: is_paid || false
     });
 
     sendAdminNotification({ type: 'formation', title, organisation: user.organisation });

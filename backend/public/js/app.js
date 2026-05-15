@@ -18,6 +18,7 @@ const routes = {
   '/alertes':           renderAlertes,
   '/profil/:id':        renderProfil,
   '/formation/:id': renderFormation,
+  '/diffusion':         renderDiffusion,
 };
 
 function navigate(path) {
@@ -1279,6 +1280,7 @@ async function submitNewFormation() {
   const type = document.getElementById('f-type')?.value;
   const duration = document.getElementById('f-duration')?.value;
   const participants = document.getElementById('f-participants')?.value;
+  const isPaid = document.getElementById('f-paid')?.value === 'true';
   const errEl = document.getElementById('form-error');
 
   if (!title || !desc || !category || !type) {
@@ -1298,14 +1300,14 @@ async function submitNewFormation() {
       <div style="background:#FFF3CD;border-radius:var(--radius-md);padding:var(--space-md);font-size:0.85rem;margin-bottom:var(--space-lg)">
         ⚠️ <strong>Attention :</strong> toute formation ne respectant pas ces conditions pourra être retirée du catalogue par l'équipe TrocLab, qui privilégie la sécurité et la facilité d'usage de ses membres.
       </div>
-      <button class="btn btn--primary w-full" onclick="confirmPublishFormation('${type}','${encodeURIComponent(title)}','${encodeURIComponent(desc)}','${encodeURIComponent(category)}',${duration},${participants})">
+      <button class="btn btn--primary w-full" onclick="confirmPublishFormation('${type}','${encodeURIComponent(title)}','${encodeURIComponent(desc)}','${encodeURIComponent(category)}',${duration},${participants},${isPaid})">
         ✅ Je confirme et publie la formation
       </button>
     </div>
   `);
 }
 
-async function confirmPublishFormation(type, title, desc, category, duration, participants) {
+async function confirmPublishFormation(type, title, desc, category, duration, participants, isPaid) {
   try {
     const res = await fetch('/api/formations', {
       method: 'POST',
@@ -1314,7 +1316,7 @@ async function confirmPublishFormation(type, title, desc, category, duration, pa
         title: decodeURIComponent(title),
         description: decodeURIComponent(desc),
         category: decodeURIComponent(category),
-        type, duration_hours: duration, max_participants: participants
+        type, duration_hours: duration, max_participants: participants, is_paid: isPaid
       })
     });
     const data = await res.json();
@@ -1786,4 +1788,52 @@ async function adminDeleteUser(id) {
   await fetch(`/api/users/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
   Toast.success('Utilisateur supprimé');
   document.querySelector('[data-tab="admin"]').click();
+}
+
+// =============================================
+// PAGE DIFFUSION — Formations payantes
+// =============================================
+async function renderDiffusion() {
+  document.title = 'Diffusion — TrocLab';
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="container" style="max-width:900px;margin:0 auto;padding:var(--space-xl) var(--space-md)">
+      <div style="margin-bottom:var(--space-xl)">
+        <span style="text-transform:uppercase;letter-spacing:.08em;font-size:.8rem;font-weight:600;color:var(--color-primary)">DIFFUSION</span>
+        <h1 class="font-display" style="margin-top:var(--space-xs)">Ateliers & formations marchandes</h1>
+        <p style="color:var(--color-text-muted);max-width:600px">Ces formations sont proposées par nos structures partenaires dans un cadre marchand. Contactez directement l'organisation pour en savoir plus.</p>
+      </div>
+      <div id="diffusion-list"><div class="empty-state">Chargement…</div></div>
+    </div>
+  `;
+
+  try {
+    const res = await fetch('/api/formations?is_paid=true&type=offered');
+    const formations = await res.json();
+    const el = document.getElementById('diffusion-list');
+
+    if (!formations.length) {
+      el.innerHTML = `<div class="empty-state"><p>Aucune formation payante pour le moment.</p></div>`;
+      return;
+    }
+
+    el.innerHTML = formations.map(f => `
+      <div class="card" style="margin-bottom:var(--space-md);padding:var(--space-lg)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-md);flex-wrap:wrap">
+          <div>
+            <span class="category-tag" style="margin-bottom:var(--space-xs)">${escapeHtml(f.category)}</span>
+            <h3 class="font-display" style="margin:var(--space-xs) 0">${escapeHtml(f.title)}</h3>
+            <p style="color:var(--color-text-muted);font-size:.9rem">${escapeHtml(f.organisation || f.user_name || '')} ${f.city ? '— ' + escapeHtml(f.city) : ''}</p>
+            <p style="margin-top:var(--space-sm)">${escapeHtml(f.description)}</p>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:.85rem;color:var(--color-text-muted)">${f.duration_hours}h · ${f.max_participants} pers. max</div>
+            <button onclick="navigate('/formation/${f.id}')" class="btn btn--primary btn--sm" style="margin-top:var(--space-sm)">En savoir plus</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    document.getElementById('diffusion-list').innerHTML = `<div class="empty-state"><h3>Erreur : ${err.message}</h3></div>`;
+  }
 }
