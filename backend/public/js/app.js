@@ -1261,6 +1261,13 @@ function openNewFormationModal() {
         <input class="form-input w-full" type="number" id="f-participants" value="8" min="1" max="50">
       </div>
     </div>
+    <div class="form-group mb-md">
+      <label class="form-label">Mode d'échange *</label>
+      <select class="form-select w-full" id="f-paid">
+        <option value="false">🤝 Troc de formation (gratuit)</option>
+        <option value="true">💶 Formation payante</option>
+      </select>
+    </div>
     <div class="form-group mb-lg">
       <label class="form-label">Type *</label>
       <select class="form-select w-full" id="f-type">
